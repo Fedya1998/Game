@@ -30,7 +30,6 @@ public:
     void move();
     void control();
     virtual void logic() = 0;
-    virtual int test() = 0;
     void dump() const;
     /*bool operator == (const Character & right) const{
         return x == right.x && right.y == y && vx == right.vx && vy == right.vy && !strcmp(name, right.name);
@@ -63,10 +62,6 @@ class Super_Hero : public Character{
 public:
     Super_Hero() : Character(){}
     Super_Hero(char * name, sf::Texture texture) : Character (name, texture){}
-    int test(){
-        return 1;
-    }
+    void logic(){};
 };
-
-
 
