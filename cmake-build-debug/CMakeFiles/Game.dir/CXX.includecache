@@ -1,0 +1,88 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/fedya/code/ded/Game/Character.h
+cstdlib
+-
+my_debug.h
+-
+
+/home/fedya/code/ded/Game/engine.h
+Character.h
+/home/fedya/code/ded/Game/Character.h
+list.h
+-
+
+/home/fedya/code/ded/Game/main.cpp
+printFe.h
+-
+super_table.h
+-
+my_functions.h
+-
+iostream
+-
+stdlib.h
+-
+engine.h
+/home/fedya/code/ded/Game/engine.h
+
+/home/fedya/Рабочий стол/my_include/debug_cpp.h
+
+/home/fedya/Рабочий стол/my_include/list.h
+cstdlib
+-
+iostream
+-
+fstream
+-
+my_debug.h
+-
+list_h.h
+-
+list_functions.h
+-
+
+/home/fedya/Рабочий стол/my_include/list_functions.h
+debug_cpp.h
+-
+
+/home/fedya/Рабочий стол/my_include/list_h.h
+
+/home/fedya/Рабочий стол/my_include/my_debug.h
+
+/home/fedya/Рабочий стол/my_include/my_functions.h
+ctype.h
+-
+assert.h
+-
+string.h
+-
+small_shit.h
+/home/fedya/Рабочий стол/my_include/small_shit.h
+
+/home/fedya/Рабочий стол/my_include/printFe.h
+iostream
+-
+stdio.h
+-
+
+/home/fedya/Рабочий стол/my_include/small_shit.h
+cstdlib
+-
+small_shit_h.h
+/home/fedya/Рабочий стол/my_include/small_shit_h.h
+list_h.h
+/home/fedya/Рабочий стол/my_include/list_h.h
+
+/home/fedya/Рабочий стол/my_include/small_shit_h.h
+
+/home/fedya/Рабочий стол/my_include/super_table.h
+cstdlib
+-
+
