@@ -10,15 +10,31 @@
 #include "Character.h"
 #include <list.h>
 
+
+
+float PhysF(float v0, float a, float time) {
+    float v;
+    if (v0 > 0) v = v0 + (a - 0.08) * time;
+    if (v0 > 5) v = 5;
+    return v;
+}
+
+float PhysR(float v0, float a, float time) {
+    float v;
+    if (v0 < 0) v = v0 + (-a + 0.08) * time;
+    if (v0 < -5) v = -5;
+    return v;
+}
+
 class Engine {
 public:
-    sf::RenderWindow window;
     sf::Texture background_image;
-    char bg_path[] = "/home/fedya/Изображения/Wallpapers/1lec598puuE.jpg";
+
+    char bg_path[100] = "/home/fedya/Изображения/Game images/bg.jpg";
 
     void run();
 
-    Engine(): window(sf::VideoMode(1920, 1080), "A Swagabitch game"){
+    Engine() {
         background_image.loadFromFile(bg_path);
     };
 
@@ -31,12 +47,15 @@ private:
 };
 
 void Engine::run() {
+    sf::RenderWindow window(sf::VideoMode(1920, 1080), "A Swagabitch game");
+    //sf::Clock clock;
     window.clear();
     sf::Sprite background_sprite(background_image);
     window.draw(background_sprite);
     window.display();
 
     while (window.isOpen()) {
+        window.clear();
         sf::Event event;
 
         while (window.pollEvent(event))
@@ -46,6 +65,10 @@ void Engine::run() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
             break;
 
+        //clock.restart();
+        window.draw(background_sprite);
+
+        //int time = (int) clock.getElapsedTime().asMicroseconds();
         for (auto elem = objects->first(); elem != objects->final(); elem++) {
             //elem.dump();
             auto object = elem.data_;

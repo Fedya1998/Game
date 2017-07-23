@@ -17,14 +17,14 @@
 int main() {
 
     List <Character> super_list;
+    char img_path[100] = "/home/fedya/Изображения/Game images/Kirill.jpg";
     char * name1 = (char *) calloc(sizeof(char), strlen("Kirill") + 1);
     strcpy(name1, "Kirill");
-    sf::Texture Kirill_texture;
-    Kirill_texture.loadFromFile("/home/fedya/Изображения/Game images/Kirill.jpg");
-    super_list.append(new Super_Hero(name1, Kirill_texture));
+    super_list.append(new Super_Hero(name1, img_path));
 
     Engine engine = Engine();
     engine.objects = &super_list;
+
     engine.run();
     free(name1);
 
