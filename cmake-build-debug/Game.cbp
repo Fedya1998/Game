@@ -5,7 +5,7 @@
 		<Option title="Game"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
-		<Option virtualFolders="CMake Files\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake_modules\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/home/fedya/code/ded/Game/cmake-build-debug"/>
@@ -95,6 +95,9 @@
 		<Unit filename="/home/fedya/code/ded/Game/main.cpp">
 			<Option target="Game"/>
 		</Unit>
+		<Unit filename="/home/fedya/code/ded/Game/not_to_copypaste.h">
+			<Option target="Game"/>
+		</Unit>
 		<Unit filename="/home/fedya/Рабочий стол/my_include/list_functions.h">
 			<Option target="Game"/>
 		</Unit>
@@ -106,6 +109,9 @@
 		</Unit>
 		<Unit filename="/home/fedya/code/ded/Game/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/fedya/code/ded/Game/cmake_modules/FindSFML.cmake">
+			<Option virtualFolder="CMake Files\cmake_modules\"/>
 		</Unit>
 	</Project>
 </CodeBlocks_project_file>

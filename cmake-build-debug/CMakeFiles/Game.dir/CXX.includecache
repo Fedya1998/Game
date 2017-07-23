@@ -25,6 +25,10 @@ super_table.h
 -
 my_functions.h
 -
+SFML/Graphics.hpp
+-
+SFML/Audio.hpp
+-
 iostream
 -
 stdlib.h

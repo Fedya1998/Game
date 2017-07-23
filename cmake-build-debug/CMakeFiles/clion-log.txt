@@ -1,4 +1,5 @@
 /opt/clion-2016.3.1/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/fedya/code/ded/Game
+-- Found SFML .. in /usr/include
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /home/fedya/code/ded/Game/cmake-build-debug
