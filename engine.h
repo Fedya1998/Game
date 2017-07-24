@@ -7,24 +7,21 @@
 
 #endif
 
-#include "Character.h"
+sf::RenderWindow window(sf::VideoMode(1920, 1080), "A Swagabitch game");
+
+void Show_Kirill(){
+    sf::Texture Kirill;
+    Kirill.loadFromFile("/home/fedya/Изображения/Game images/Kirill.jpg");
+    sf::Sprite sprite(Kirill);
+    window.draw(sprite);
+    window.display();
+}
+
 #include <list.h>
+#include "Character.h"
 
 
 
-float PhysF(float v0, float a, float time) {
-    float v;
-    if (v0 > 0) v = v0 + (a - 0.08) * time;
-    if (v0 > 5) v = 5;
-    return v;
-}
-
-float PhysR(float v0, float a, float time) {
-    float v;
-    if (v0 < 0) v = v0 + (-a + 0.08) * time;
-    if (v0 < -5) v = -5;
-    return v;
-}
 
 class Engine {
 public:
@@ -42,12 +39,13 @@ public:
 
 
     List<Character> *objects = NULL;
+
 private:
     void logic();
 };
 
 void Engine::run() {
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "A Swagabitch game");
+
     //sf::Clock clock;
     window.clear();
     sf::Sprite background_sprite(background_image);
@@ -72,9 +70,11 @@ void Engine::run() {
         for (auto elem = objects->first(); elem != objects->final(); elem++) {
             //elem.dump();
             auto object = elem.data_;
+            object->logic(objects);
             object->control();
             object->move();
-            object->draw(window);
+            object->draw();
+            object->live(&elem);
         }
         window.display();
     }

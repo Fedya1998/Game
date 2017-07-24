@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <my_debug.h>
 #include <ctime>
+#include <cmath>
+#include <list_h.h>
 
 #ifndef GAME_CHARACTER_H
 #define GAME_CHARACTER_H
@@ -12,51 +14,82 @@
 #endif //GAME_CHARACTER_H
 
 
-
-class Character{
+class Character {
 protected:
     sf::Vector2f coord;
     sf::Vector2f v;
     sf::Vector2f a;
-    int angle = 0;
-    char * name = NULL;
+    float angle = 0;
+    char *name = NULL;
     size_t health = 0;
     size_t stamina = 0;
+    size_t base_damage = 0;
     sf::Texture texture_;
     sf::Sprite sprite_;
 public:
-    Character(){}
-    Character(char * name, char * img_path): name(name){
+    Character() {}
+
+    Character(char *name, char *img_path) : name(name) {
         texture_.loadFromFile(img_path);
         sf::Sprite sprite(texture_);
         sprite_ = sprite;
     }
-    ~Character(){}
-    void draw(sf::RenderWindow & window);
-    virtual void move(){}
+
+    ~Character() {}
+
+    float distance(Character &Char);
+
+    void suffer(size_t damage);
+
+    void draw();
+
+    void move();
+
     void control();
-    virtual void logic() = 0;
+
+    virtual void logic(List<Character> *objects) = 0;
+
+    void live(List_Elem<Character> * elem);
+
+    virtual void die(List_Elem<Character> *elem) = 0;
+
     void dump() const;
-    bool operator == (const Character & right) const{
-        return coord.x == right.coord.x && right.coord.y == coord.y && v.x == right.v.x && v.y == right.v.y && !strcmp(name, right.name);
+
+    bool operator==(const Character &right) const {
+        return coord.x == right.coord.x && right.coord.y == coord.y && v.x == right.v.x && v.y == right.v.y &&
+               !strcmp(name, right.name);
     }
-    bool operator != (const Character & right) const{
+
+    bool operator!=(const Character &right) const {
         return !(*this == right);
     }
 };
 
-void Character::dump() const{
+void Character::dump() const {
     printFe("\nname %\nx %\ny %\nvx %\nvy %\nax %\nay %\n", name, coord.x, coord.y, v.x, v.y, a.x, a.y);
+    printFe("health %\nstamina %\n", health, stamina);
 }
 
-void Character::draw(sf::RenderWindow & window) {
+void Character::draw() {
     sprite_.setPosition(coord);
     window.draw(sprite_);
 }
 
+void Character::move() {
+    coord.x += v.x * 0.01;
+    coord.y += v.y * 0.01;
+    v.x += a.x;
+    v.y += a.y;
+
+    if (IsEqual(v.x, 0, 0.1))
+        v.x = 0;
+    if (IsEqual(v.y, 0, 0.1))
+        v.y = 0;
+}
+
 void Character::control() {
 
-    float accel = 0.5;
+    const float accel = 0.5;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
         a.x = accel;
@@ -83,32 +116,94 @@ void Character::control() {
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-        angle++;
+        angle += 0.4;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
-        angle--;
-
+        angle -= 0.4;
 
 
     sprite_.setRotation(angle);
 }
 
-class Super_Hero : public Character{
+float Character::distance(Character &Char) {
+    return (float) sqrt(pow(coord.x - Char.coord.x, 2) + pow(coord.y - Char.coord.y, 2));
+}
+
+void Character::live(List_Elem<Character> * elem) {
+    if (health <= 0)
+        die(elem);
+}
+
+void Character::suffer(size_t damage) {
+    health -= damage;
+}
+
+
+
+
+class Super_Hero : public Character {
 public:
 
-    Super_Hero() : Character(){}
-    Super_Hero(char * name, char * img_path) : Character (name, img_path){}
-    void logic(){};
-    void move(){
-        coord.x += v.x * 0.01;
-        coord.y += v.y * 0.01;
-        v.x += a.x;
-        v.y += a.y;
-
-        if (IsEqual(v.x, 0, 0.1))
-            v.x = 0;
-        if (IsEqual(v.y, 0, 0.1))
-            v.y = 0;
+    Super_Hero() : Character() {
+        health = 100;
+        stamina = 100;
     }
+
+    Super_Hero(char *name, char *img_path) : Character(name, img_path) {
+        health = 100;
+        stamina = 100;
+    }
+
+    void logic(List<Character> *objects) {}
+
+    void die(List_Elem<Character> *elem);
 };
+
+void Super_Hero::die(List_Elem<Character> *elem) {
+    Show_Kirill();
+    getchar();
+}
+
+
+
+
+class Enemy : public Character {
+    size_t health = 10;
+    size_t stamina = 100;
+    size_t base_damage = 10;
+    int distance_to_attack = 5;
+    int distance_to_see = 30;
+
+    //Enemy() : Character(){}
+    Enemy(char *name, char *img_path) : Character(name, img_path) {}
+
+    void attack(Character &Char);
+
+    void follow(Character &Char);
+
+    void logic(List<Character> &objects);
+
+    void die(List_Elem<Character> *elem);
+};
+
+void Enemy::attack(Character &Char) {
+    Char.suffer(base_damage);
+}
+
+void Enemy::logic(List<Character> &objects) {
+    Super_Hero Hero =  (Super_Hero &) *objects[0].data_;
+    if (distance(Hero) < distance_to_see)
+        follow(Hero);
+    if (distance(Hero) < distance_to_attack)
+        attack(Hero);
+}
+
+void Enemy::die(List_Elem<Character> *elem) {
+    delete elem;
+}
+
+void Enemy::follow(Character &Char) {
+
+}
+
 
