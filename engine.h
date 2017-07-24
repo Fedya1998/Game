@@ -31,14 +31,14 @@ public:
 
     void run();
 
-    Engine() {
+    Engine(List<Character> &objects) :objects(objects) {
         background_image.loadFromFile(bg_path);
     };
 
     ~Engine() {};
 
 
-    List<Character> *objects = NULL;
+    List<Character> &objects;
 
 private:
     void logic();
@@ -67,7 +67,7 @@ void Engine::run() {
         window.draw(background_sprite);
 
         //int time = (int) clock.getElapsedTime().asMicroseconds();
-        for (auto elem = objects->first(); elem != objects->final(); elem++) {
+        for (auto elem = objects.first(); elem != objects.final(); elem++) {
             //elem.dump();
             auto object = elem.data_;
             object->logic(objects);

@@ -35,7 +35,9 @@ public:
         sprite_ = sprite;
     }
 
-    ~Character() {}
+    ~Character() {
+        free(name);
+    }
 
     float distance(Character &Char);
 
@@ -45,9 +47,9 @@ public:
 
     void move();
 
-    void control();
+    virtual void control() = 0;
 
-    virtual void logic(List<Character> *objects) = 0;
+    virtual void logic(List<Character> &objects) = 0;
 
     void live(List_Elem<Character> * elem);
 
@@ -87,7 +89,51 @@ void Character::move() {
         v.y = 0;
 }
 
-void Character::control() {
+
+float Character::distance(Character &Char) {
+    return (float) sqrt(pow(coord.x - Char.coord.x, 2) + pow(coord.y - Char.coord.y, 2));
+}
+
+void Character::live(List_Elem<Character> * elem) {
+    if (health <= 0)
+        die(elem);
+}
+
+void Character::suffer(size_t damage) {
+    health -= damage;
+}
+
+
+
+
+class Super_Hero : public Character {
+public:
+
+    Super_Hero() : Character() {
+        health = 100;
+        stamina = 100;
+    }
+
+    Super_Hero(char *name, char *img_path) : Character(name, img_path) {
+        health = 100;
+        stamina = 100;
+    }
+
+    //~Super_Hero() {}
+
+    void control();
+
+    void logic(List<Character> &objects) {}
+
+    void die(List_Elem<Character> *elem);
+};
+
+void Super_Hero::die(List_Elem<Character> *elem) {
+    Show_Kirill();
+    getchar();
+}
+
+void Super_Hero::control() {
 
     const float accel = 0.5;
 
@@ -125,57 +171,24 @@ void Character::control() {
     sprite_.setRotation(angle);
 }
 
-float Character::distance(Character &Char) {
-    return (float) sqrt(pow(coord.x - Char.coord.x, 2) + pow(coord.y - Char.coord.y, 2));
-}
-
-void Character::live(List_Elem<Character> * elem) {
-    if (health <= 0)
-        die(elem);
-}
-
-void Character::suffer(size_t damage) {
-    health -= damage;
-}
-
-
-
-
-class Super_Hero : public Character {
-public:
-
-    Super_Hero() : Character() {
-        health = 100;
-        stamina = 100;
-    }
-
-    Super_Hero(char *name, char *img_path) : Character(name, img_path) {
-        health = 100;
-        stamina = 100;
-    }
-
-    void logic(List<Character> *objects) {}
-
-    void die(List_Elem<Character> *elem);
-};
-
-void Super_Hero::die(List_Elem<Character> *elem) {
-    Show_Kirill();
-    getchar();
-}
-
-
 
 
 class Enemy : public Character {
-    size_t health = 10;
-    size_t stamina = 100;
-    size_t base_damage = 10;
-    int distance_to_attack = 5;
-    int distance_to_see = 30;
-
+public:
     //Enemy() : Character(){}
-    Enemy(char *name, char *img_path) : Character(name, img_path) {}
+    Enemy(char *name, char *img_path) : Character(name, img_path) {
+        health = 100;
+        stamina = 100;
+        coord.x = 1000;
+        coord.y = 500;
+        base_damage = 10;
+    }
+    void control(){}
+
+protected:
+    int distance_to_attack = 50;
+    int distance_to_see = 300;
+
 
     void attack(Character &Char);
 
@@ -191,15 +204,17 @@ void Enemy::attack(Character &Char) {
 }
 
 void Enemy::logic(List<Character> &objects) {
-    Super_Hero Hero =  (Super_Hero &) *objects[0].data_;
+    Super_Hero &Hero =  (Super_Hero &) *objects[0].data_;
     if (distance(Hero) < distance_to_see)
         follow(Hero);
-    if (distance(Hero) < distance_to_attack)
+    if (distance(Hero) < distance_to_attack) {
+        //printFe("Ready to attack\n");
         attack(Hero);
+    }
 }
 
 void Enemy::die(List_Elem<Character> *elem) {
-    delete elem;
+    delete (List_Elem<Enemy> *) elem;
 }
 
 void Enemy::follow(Character &Char) {

@@ -24,11 +24,14 @@ int main() {
     strcpy(name1, "Kirill");
     super_list.append(new Super_Hero(name1, img_path));
 
-    Engine engine = Engine();
-    engine.objects = &super_list;
+    char img_path2[100] = "/home/fedya/Изображения/Game images/zombie.png";
+    char * name2 = (char *) calloc(sizeof(char), strlen("Zombie") + 1);
+    strcpy(name2, "Zombie");
+    super_list.append(new Enemy(name2, img_path2));
+
+    Engine engine = Engine(super_list);
 
     engine.run();
-    free(name1);
 
     return 0;
 }
