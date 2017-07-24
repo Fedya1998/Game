@@ -18,7 +18,7 @@ void Show_Kirill(){
 }
 
 #include <list.h>
-#include "Character.h"
+#include "body_functions.h"
 
 
 
@@ -31,14 +31,14 @@ public:
 
     void run();
 
-    Engine(List<Character> &objects) :objects(objects) {
+    Engine(List<Physical_Body> &objects) :objects(objects) {
         background_image.loadFromFile(bg_path);
     };
 
     ~Engine() {};
 
 
-    List<Character> &objects;
+    List<Physical_Body> &objects;
 
 private:
     void logic();
@@ -69,12 +69,13 @@ void Engine::run() {
         //int time = (int) clock.getElapsedTime().asMicroseconds();
         for (auto elem = objects.first(); elem != objects.final(); elem++) {
             //elem.dump();
-            auto object = elem.data_;
+            auto object = (Character *) elem.data_;
             object->logic(objects);
             object->control();
-            object->move();
+            object->move((List <Movable> &)objects);
             object->draw();
             object->live(&elem);
+
         }
         window.display();
     }

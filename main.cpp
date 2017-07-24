@@ -18,7 +18,7 @@
 
 int main() {
 
-    List <Character> super_list;
+    List <Physical_Body> super_list;
     char img_path[100] = "/home/fedya/Изображения/Game images/deer.png";
     char * name1 = (char *) calloc(sizeof(char), strlen("Kirill") + 1);
     strcpy(name1, "Kirill");

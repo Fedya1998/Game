@@ -7,55 +7,87 @@
 #include <ctime>
 #include <cmath>
 #include <list_h.h>
+#include <SFML/Graphics.hpp>
 
 #ifndef GAME_CHARACTER_H
 #define GAME_CHARACTER_H
 
 #endif //GAME_CHARACTER_H
 
+const int INF_MASS = -1;
 
-class Character {
+class Physical_Body {
 protected:
     sf::Vector2f coord;
-    sf::Vector2f v;
-    sf::Vector2f a;
-    float angle = 0;
+    size_t width = 0;
+    size_t height = 0;
     char *name = NULL;
-    size_t health = 0;
-    size_t stamina = 0;
-    size_t base_damage = 0;
     sf::Texture texture_;
     sf::Sprite sprite_;
+    int mass = INF_MASS;
 public:
-    Character() {}
-
-    Character(char *name, char *img_path) : name(name) {
+    Physical_Body(char *name, char *img_path) : name(name) {
         texture_.loadFromFile(img_path);
         sf::Sprite sprite(texture_);
         sprite_ = sprite;
+        width = texture_.getSize().x;
+        height = texture_.getSize().y;
+        sprite_.setOrigin(width / 2, height / 2);
     }
-
-    ~Character() {
+    virtual ~Physical_Body() {
         free(name);
     }
+    virtual void draw();
+    bool intersection(Physical_Body &Body);
+    float distance(Physical_Body &Body);
+    virtual void dump() const;
 
-    float distance(Character &Char);
+    bool operator ==(const Physical_Body &right){
+        return coord.x == right.coord.x && right.coord.y == coord.y && !strcmp(name, right.name);
+    }
+
+    bool operator !=(const Physical_Body &right) {
+        return !(*this==right);
+    }
+
+};
+
+class Movable : public Physical_Body {
+protected:
+    sf::Vector2f v;
+    sf::Vector2f a;
+    size_t v_max = 0;
+public:
+    Movable(char *name, char *img_path) : Physical_Body (name, img_path) {}
+    void move(List<Movable> &objects);
+    void collide(Physical_Body &Body);
+};
+
+class Character : public Movable {
+protected:
+    float angle = 0;
+    size_t health = 0;
+    size_t stamina = 0;
+    size_t base_damage = 0;
+    size_t cooldown = 0;
+public:
+    Character(char *name, char *img_path) : Movable (name, img_path) {}
+
+
 
     void suffer(size_t damage);
 
-    void draw();
-
-    void move();
+    void draw() override;
 
     virtual void control() = 0;
 
-    virtual void logic(List<Character> &objects) = 0;
+    virtual void logic(List<Physical_Body> &objects) = 0;
 
-    void live(List_Elem<Character> * elem);
+    void live(List_Elem<Physical_Body> * elem);
 
-    virtual void die(List_Elem<Character> *elem) = 0;
+    virtual void die(List_Elem<Physical_Body> *elem) = 0;
 
-    void dump() const;
+    void dump() const override;
 
     bool operator==(const Character &right) const {
         return coord.x == right.coord.x && right.coord.y == coord.y && v.x == right.v.x && v.y == right.v.y &&
@@ -67,111 +99,25 @@ public:
     }
 };
 
-void Character::dump() const {
-    printFe("\nname %\nx %\ny %\nvx %\nvy %\nax %\nay %\n", name, coord.x, coord.y, v.x, v.y, a.x, a.y);
-    printFe("health %\nstamina %\n", health, stamina);
-}
-
-void Character::draw() {
-    sprite_.setPosition(coord);
-    window.draw(sprite_);
-}
-
-void Character::move() {
-    coord.x += v.x * 0.01;
-    coord.y += v.y * 0.01;
-    v.x += a.x;
-    v.y += a.y;
-
-    if (IsEqual(v.x, 0, 0.1))
-        v.x = 0;
-    if (IsEqual(v.y, 0, 0.1))
-        v.y = 0;
-}
-
-
-float Character::distance(Character &Char) {
-    return (float) sqrt(pow(coord.x - Char.coord.x, 2) + pow(coord.y - Char.coord.y, 2));
-}
-
-void Character::live(List_Elem<Character> * elem) {
-    if (health <= 0)
-        die(elem);
-}
-
-void Character::suffer(size_t damage) {
-    health -= damage;
-}
-
-
-
-
 class Super_Hero : public Character {
 public:
-
-    Super_Hero() : Character() {
-        health = 100;
-        stamina = 100;
-    }
-
     Super_Hero(char *name, char *img_path) : Character(name, img_path) {
         health = 100;
         stamina = 100;
+        v_max = 100;
+        cooldown = 50;
     }
 
     //~Super_Hero() {}
 
-    void control();
+    void control() override;
 
-    void logic(List<Character> &objects) {}
+    void logic(List<Physical_Body> &objects) override{
 
-    void die(List_Elem<Character> *elem);
+    }
+
+    void die(List_Elem<Physical_Body> *elem) override;
 };
-
-void Super_Hero::die(List_Elem<Character> *elem) {
-    Show_Kirill();
-    getchar();
-}
-
-void Super_Hero::control() {
-
-    const float accel = 0.5;
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-        a.x = accel;
-    else {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-            a.x = -accel;
-        else {
-            if (!IsEqual(v.x, 0, 0.9))
-                a.x = -Sign(v.x);
-            else a.x = 0;
-        }
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-        a.y = accel;
-    else {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-            a.y = -accel;
-        else {
-            if (!IsEqual(v.y, 0, 0.9))
-                a.y = -Sign(v.y);
-            else a.y = 0;
-        }
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-        angle += 0.4;
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
-        angle -= 0.4;
-
-
-    sprite_.setRotation(angle);
-}
-
-
 
 class Enemy : public Character {
 public:
@@ -182,8 +128,9 @@ public:
         coord.x = 1000;
         coord.y = 500;
         base_damage = 10;
+        cooldown = 50;
     }
-    void control(){}
+    void control() override{}
 
 protected:
     int distance_to_attack = 50;
@@ -194,31 +141,7 @@ protected:
 
     void follow(Character &Char);
 
-    void logic(List<Character> &objects);
+    void logic(List<Physical_Body> &objects) override;
 
-    void die(List_Elem<Character> *elem);
+    void die(List_Elem<Physical_Body> *elem) override;
 };
-
-void Enemy::attack(Character &Char) {
-    Char.suffer(base_damage);
-}
-
-void Enemy::logic(List<Character> &objects) {
-    Super_Hero &Hero =  (Super_Hero &) *objects[0].data_;
-    if (distance(Hero) < distance_to_see)
-        follow(Hero);
-    if (distance(Hero) < distance_to_attack) {
-        //printFe("Ready to attack\n");
-        attack(Hero);
-    }
-}
-
-void Enemy::die(List_Elem<Character> *elem) {
-    delete (List_Elem<Enemy> *) elem;
-}
-
-void Enemy::follow(Character &Char) {
-
-}
-
-
