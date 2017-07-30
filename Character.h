@@ -24,7 +24,7 @@ protected:
     char *name = NULL;
     sf::Texture texture_;
     sf::Sprite sprite_;
-    int mass = INF_MASS;
+    float mass = INF_MASS;
 public:
     Physical_Body(char *name, char *img_path) : name(name) {
         texture_.loadFromFile(img_path);
@@ -61,6 +61,7 @@ public:
     Movable(char *name, char *img_path) : Physical_Body (name, img_path) {}
     void move(List<Movable> &objects);
     void collide(Physical_Body &Body);
+    void collide(Movable &Mvbl);
 };
 
 class Character : public Movable {
@@ -106,6 +107,7 @@ public:
         stamina = 100;
         v_max = 100;
         cooldown = 50;
+        mass = 100;
     }
 
     //~Super_Hero() {}
@@ -129,6 +131,7 @@ public:
         coord.y = 500;
         base_damage = 10;
         cooldown = 50;
+        mass = 200;
     }
     void control() override{}
 

@@ -1,4 +1,4 @@
-#define NDEBUG
+#define DEBUG
 
 #include <printFe.h>
 #include <super_table.h>

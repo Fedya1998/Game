@@ -54,15 +54,23 @@ void Movable::move(List<Movable> &objects) {
         v.y += a.y;
     }
 
-    if (IsEqual(v.x, 0, 0.5))
+    if (IsEqual(v.x, 0, 1))
         v.x = 0;
-    if (IsEqual(v.y, 0, 0.5))
+    if (IsEqual(v.y, 0, 1))
         v.y = 0;
 }
 
 void Movable::collide(Physical_Body &Body) {
-    v.x *= -1;//Test values to make it bounce
-    v.y *= -1;//
+    const float alpha = 0.5;//This part of energy goes to deformation and other shit
+    v *= sqrtf(1 - alpha);//We've met a wall
+}
+
+void Movable::collide(Movable &Body) {
+    const float alpha = 0.5;//This part of energy goes to deformation and other shit
+    sf::Vector2f v_old = v;
+    const float gamma = mass / Body.mass;
+    v = (gamma * v_old + Body.v) * (1 / 2 / (gamma + 1)) * (1 - sqrtf((1 - alpha * (gamma + 1)) * gamma));
+    Body.v = gamma * v_old + Body.v - gamma * v;
 }
 
 void Character::dump() const{
