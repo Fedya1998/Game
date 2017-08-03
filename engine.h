@@ -17,54 +17,299 @@ void Show_Kirill(){
     window.display();
 }
 
-bool FirstPress = true;
-sf::Vector2i Start;
-sf::Vector2i Now;
-
-void Allot(sf::Sprite Allot_s) {
-    if (FirstPress) {
-        Start = sf::Mouse::getPosition(window);
-        FirstPress = false;
-    }
-    Now = sf::Mouse::getPosition(window);
-    if (Now.x > Start.x) {
-        if (Now.y > Start.y) {
-            Allot_s.setPosition(Start.x, Start.y);
-            Allot_s.setTextureRect(sf::IntRect(0, 0, Now.x - Start.x, Now.y - Start.y));
-        } else {
-            Allot_s.setPosition(Start.x, Now.y);
-            Allot_s.setTextureRect(sf::IntRect(0, 0, Now.x - Start.x, Start.y - Now.y));
-        }
-    } else {
-        if (Now.y > Start.y) {
-            Allot_s.setPosition(Now.x, Start.y);
-            Allot_s.setTextureRect(sf::IntRect(0, 0, Start.x - Now.x, Now.y - Start.y));
-        } else {
-            Allot_s.setPosition(Now.x, Now.y);
-            Allot_s.setTextureRect(sf::IntRect(0, 0, Start.x - Now.x, Start.y - Now.y));
-        }
-    }
-    window.draw(Allot_s);
-}
-
 #include <list.h>
 #include "body_functions.h"
 
 
 
+sf::Vector2i Start;
+sf::Vector2i Now;
+sf::Vector2i Finish;
+bool FirstPress = true, FirstPress1 = true, FirstPress2 = true, StartSeted = false;
 
-class Engine {
+//bool FirstKeyDownR() {
+//    if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && FirstPress) {
+//        FirstPress = false;
+//        printf("1");
+//        return true;
+//    } else {
+//        if ((!sf::Mouse::isButtonPressed(sf::Mouse::Right)) && !FirstPress) {
+//            FirstPress = true;
+//            printf("2");
+//        }
+//        return false;
+//    }
+//}
+//bool FirstKeyDownL() {
+//    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+////        FirstPress = false;
+//       printf("1");
+//        return FirstPress;
+//    } else {
+//        if (!FirstPress) {
+//            FirstPress = true;
+//            printf("2");
+//        }
+//        return false;
+//    }
+//}
+
+float Distance(sf::Vector2i a, sf::Vector2i b) {
+    return sqrt(pow (a.x - b.x, 2) + pow (a.y - b.y, 2));
+}
+
+
+
+
+class Point {
 public:
+    int wave = -1;
+    sf::Vector2i point_pos;
+    bool passable = true, allotment = false, partOfJorney = false;
+};
+
+class Block: public Point {
+public:
+    sf::Vector2i FocusOn;
+    sf::Texture block_tex;
+    sf::Sprite block_spr;
+
+    Block() {
+        block_tex.loadFromFile("/Users/gregpost/CLionProjects/Копия TOPPRYGA/block.png");
+        sf::Sprite sprite(block_tex);
+        block_spr = sprite;
+        int width = block_tex.getSize().x;
+        int height = block_tex.getSize().y;
+        block_spr.setOrigin( width / 2, height / 2);
+    }
+
+    void Create (class Point blocks[][16]) {
+        int i, j;
+        float max = 1000000;
+        if (FirstPress1) {
+            for (i = 0; i < 9; i++)
+                for (j = 0; j < 16; j++) {
+                    if (Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos) < max) {
+                        max = Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos);
+                        sf::Vector2i vector(i, j);
+                        FocusOn = vector;
+                    }
+                }
+            if (blocks[FocusOn.x][FocusOn.y].passable) {
+                blocks[FocusOn.x][FocusOn.y].passable = false;
+                block_spr.setPosition(blocks[FocusOn.x][FocusOn.y].point_pos.x, blocks[FocusOn.x][FocusOn.y].point_pos.y);
+            } else blocks[FocusOn.x][FocusOn.y].passable = true;
+        }
+        FirstPress1 = false;
+    }
+
+    void ShowBlocks(class Point blocks[][16]) {
+        int i, j;
+        for (i = 0; i < 9; i++)
+            for (j = 0; j < 16; j++)
+                if (blocks[i][j].passable == false) {
+                    block_spr.setPosition(blocks[i][j].point_pos.x, blocks[i][j].point_pos.y);
+                    window.draw(block_spr);
+                }
+        //sf::Vector2i vector(0, 0);
+        //FocusOn = vector;
+    }
+};
+
+
+
+
+class Traveler: public Point {
+public:
+
+    sf::Vector2i FocusOn;
+    sf::Texture travel_tex;
+    sf::Sprite travel_spr;
+
+    sf::Vector2i Start, Finish;
+
+    Traveler() {
+        travel_tex.loadFromFile("/Users/gregpost/CLionProjects/Копия TOPPRYGA/traveler.png");
+        sf::Sprite sprite(travel_tex);
+        travel_spr = sprite;
+        int width = travel_tex.getSize().x;
+        int height = travel_tex.getSize().y;
+        travel_spr.setOrigin( width / 2, height / 2);
+    }
+
+    void create(class Point blocks[][16]) {
+        int i, j;
+        float min = 1000000;
+        if (FirstPress2) {
+            for (i = 0; i < 9; i++)
+                for (j = 0; j < 16; j++) {
+                    if (!StartSeted)
+                        blocks[i][j].partOfJorney = false;
+                    if (Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos) < min) {
+                        min = Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos);
+                        sf::Vector2i vector(i, j);
+                        FocusOn = vector;
+                    }
+                }
+            if ((blocks[FocusOn.x][FocusOn.y].passable) && !StartSeted) {
+                travel_spr.setPosition(blocks[FocusOn.x][FocusOn.y].point_pos.x, blocks[FocusOn.x][FocusOn.y].point_pos.y);
+                Start = FocusOn;
+                StartSeted = true;
+                blocks[FocusOn.x][FocusOn.y].wave = 0;
+            } else
+                if (StartSeted && (blocks[FocusOn.x][FocusOn.y].passable)) {
+                    StartSeted = false;
+                    sf::Vector2i vector(FocusOn.x, FocusOn.y);
+                    Finish = vector;
+                }
+
+        }
+        FirstPress2 = false;
+    }
+
+    void Wave(class Point blocks[][16]) {
+        int i, j, k;
+        for (k = 0; k < 400; k++){
+            for (i = 0; i < 9; i++)
+                for (j = 0; j < 16; j++)
+                    if ((blocks[i][j].wave >= 0) && (blocks[i][j].passable)) {
+                        if ((blocks[i - 1][j].wave < 0) && blocks[i - 1][j].passable)
+                            blocks[i - 1][j].wave = blocks[i][j].wave + 1;
+                        if ((blocks[i][j - 1].wave < 0) && blocks[i][j - 1].passable)
+                            blocks[i][j - 1].wave = blocks[i][j].wave + 1;
+                        if ((blocks[i + 1][j].wave < 0) && blocks[i + 1][j].passable )
+                            blocks[i + 1][j].wave = blocks[i][j].wave + 1;
+                        if ((blocks[i][j + 1].wave < 0) && blocks[i][j + 1].passable)
+                            blocks[i][j + 1].wave = blocks[i][j].wave + 1;
+//                        if ((blocks[i - 1][j - 1].wave < 0) && blocks[i - 1][j - 1].passable)
+//                            blocks[i - 1][j - 1].wave = blocks[i][j].wave + 1;
+//                        if ((blocks[i - 1][j + 1].wave < 0) && blocks[i - 1][j + 1].passable)
+//                            blocks[i - 1][j + 1].wave = blocks[i][j].wave + 1;
+//                        if ((blocks[i + 1][j - 1].wave < 0) && blocks[i + 1][j - 1].passable)
+//                            blocks[i + 1][j - 1].wave = blocks[i][j].wave + 1;
+//                        if ((blocks[i + 1][j + 1].wave < 0) && blocks[i + 1][j + 1].passable)
+//                            blocks[i + 1][j + 1].wave = blocks[i][j].wave + 1;
+                    }
+
+        }
+    }
+
+    void GoBack(class Point blocks[][16]) {
+        int k;
+        for (k = 0; k < 1000; k++) {
+            if (blocks[Finish.x][Finish.y - 1].wave - blocks[Finish.x][Finish.y].wave == -1) {
+                Finish.y = Finish.y - 1;
+                travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
+                blocks[Finish.x][Finish.y].partOfJorney = true;
+            } else
+            if (blocks[Finish.x][Finish.y + 1].wave - blocks[Finish.x][Finish.y].wave == -1) {
+                Finish.y = Finish.y + 1;
+                travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
+                blocks[Finish.x][Finish.y].partOfJorney = true;
+            } else
+            if (blocks[Finish.x - 1][Finish.y].wave - blocks[Finish.x][Finish.y].wave == -1) {
+                Finish.x = Finish.x - 1;
+                travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
+                blocks[Finish.x][Finish.y].partOfJorney = true;
+            } else
+            if (blocks[Finish.x + 1][Finish.y].wave - blocks[Finish.x][Finish.y].wave == -1) {
+                Finish.x = Finish.x + 1;
+                travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
+                blocks[Finish.x][Finish.y].partOfJorney = true;
+            } //else
+//            if (blocks[Finish.x - 1][Finish.y - 1].wave - blocks[Finish.x][Finish.y].wave == -1) {
+//                Finish.y = Finish.y - 1;
+//                Finish.x = Finish.x - 1;
+//                travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
+//                blocks[Finish.x][Finish.y].partOfJorney = true;
+//            } else
+//            if (blocks[Finish.x + 1][Finish.y - 1].wave - blocks[Finish.x][Finish.y].wave == -1) {
+//                Finish.y = Finish.y - 1;
+//                Finish.x = Finish.x + 1;
+//                travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
+//                blocks[Finish.x][Finish.y].partOfJorney = true;
+//            } else
+//            if (blocks[Finish.x - 1][Finish.y + 1].wave - blocks[Finish.x][Finish.y].wave == -1) {
+//                Finish.y = Finish.y + 1;
+//                Finish.x = Finish.x - 1;
+//                travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
+//                blocks[Finish.x][Finish.y].partOfJorney = true;
+//            } else
+//            if (blocks[Finish.x + 1][Finish.y + 1].wave - blocks[Finish.x][Finish.y].wave == -1) {
+//                Finish.y = Finish.y + 1;
+//                Finish.x = Finish.x + 1;
+//                travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
+//                blocks[Finish.x][Finish.y].partOfJorney = true;
+//            }
+        }
+    }
+
+    void ShowJorney(class Point blocks[][16]) {
+        int i, j;
+        for (i = 0; i < 9; i++)
+            for (j = 0; j < 16; j++)
+                if (blocks[i][j].partOfJorney) {
+                    travel_spr.setPosition(blocks[i][j].point_pos.x, blocks[i][j].point_pos.y);
+                    window.draw(travel_spr);
+                }
+    }
+};
+
+
+
+
+
+
+class Mysh {
+
+
+public:
+    void Allot(sf::Sprite Allot_s) {
+        if (FirstPress) {
+            Start = sf::Mouse::getPosition(window);
+            FirstPress = false;
+        }
+        Now = sf::Mouse::getPosition(window);
+        if (Now.x > Start.x) {
+            if (Now.y > Start.y) {
+                Allot_s.setPosition(Start.x, Start.y);
+                Allot_s.setTextureRect(sf::IntRect(0, 0, Now.x - Start.x, Now.y - Start.y));
+            } else {
+                Allot_s.setPosition(Start.x, Now.y);
+                Allot_s.setTextureRect(sf::IntRect(0, 0, Now.x - Start.x, Start.y - Now.y));
+            }
+        } else {
+            if (Now.y > Start.y) {
+                Allot_s.setPosition(Now.x, Start.y);
+                Allot_s.setTextureRect(sf::IntRect(0, 0, Start.x - Now.x, Now.y - Start.y));
+            } else {
+                Allot_s.setPosition(Now.x, Now.y);
+                Allot_s.setTextureRect(sf::IntRect(0, 0, Start.x - Now.x, Start.y - Now.y));
+            }
+        }
+        window.draw(Allot_s);
+    }
+};
+
+
+class Engine: public Mysh, public Point {
+public:
+
     sf::Texture background_image;
     sf::Texture Allot_t;
+    Point blocks[9][16];
+    Mysh focus;
+    Block AlgoritmLi;
 
     char bg_path[100] = "/Users/gregpost/CLionProjects/TOPPRYGA/bg.jpg";
 
     void run();
 
     Engine(List<Physical_Body> &objects) :objects(objects) {
+        int i, j;
         background_image.loadFromFile(bg_path);
         Allot_t.loadFromFile("/Users/gregpost/CLionProjects/Копия TOPPRYGA/Allot.png");
+
     };
 
     ~Engine() {};
@@ -74,16 +319,43 @@ public:
 
 private:
     void logic();
+
 };
+
 
 void Engine::run() {
 
-    //sf::Clock clock;
+    Traveler bob;
     window.clear();
     sf::Sprite background_sprite(background_image);
     sf::Sprite Allot_s(Allot_t);
     window.draw(background_sprite);
     window.display();
+
+    int i, j;
+    blocks[0][0].point_pos.x = 60;
+    blocks[0][0].point_pos.y = 60;
+    blocks[0][0].passable = true;
+    blocks[0][0].allotment = false;
+    i = j = 0;
+    for (i = 0; i < 9; i++) {
+        if ((i != 0) || (j != 0)) {
+            blocks[i][0].point_pos.y = blocks[i - 1][0].point_pos.y + 120;
+            blocks[i][0].point_pos.x = blocks[i - 1][0].point_pos.x;
+        }
+        for (j = 1; j < 16; j++) {
+            if ((i != 0) || (j != 0)) {
+                blocks[i][j].point_pos.x = blocks[i][j - 1].point_pos.x + 120;
+                blocks[i][j].point_pos.y = blocks[i][j - 1].point_pos.y;
+                blocks[i][j].passable = true;
+                blocks[i][j].allotment = false;
+            }
+        }
+    }
+    for (i = 0; i < 9; i++)
+        for (j = 0; j < 16; j++)
+            if (((i < 1) || (i > 7)) || ((j < 1) || (j > 14)))
+                blocks[i][j].passable = false;
 
     while (window.isOpen()) {
         window.clear();
@@ -99,22 +371,42 @@ void Engine::run() {
 
         //clock.restart();
         window.draw(background_sprite);
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-            Allot(Allot_s);
+      if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            focus.Allot(Allot_s);
+            bob.create(blocks);
+            if (!StartSeted) {
+                bob.Wave(blocks);
+                bob.GoBack(blocks);
+            }
         } else {
-            if (!FirstPress) FirstPress = true;
+            if (!FirstPress) {
+                FirstPress = true;
+                FirstPress2 = true;
+            }
         }
 
-       // window.draw(health_line);
+        bob.ShowJorney(blocks);
+
+       if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+           AlgoritmLi.Create(blocks);
+        } else {
+            if (!FirstPress1) FirstPress1 = true;
+        }
+        AlgoritmLi.ShowBlocks(blocks);
+
+
+
+
+        // window.draw(health_line);
         //int time = (int) clock.getElapsedTime().asMicroseconds();
         for (auto elem = objects.first(); elem != objects.final(); elem++) {
             //elem.dump();
             auto object = (Character *) elem.data_;
             object->logic(objects);
             object->control();
-            object->move((List <Movable> &)objects);
-            object->draw();
-            object->live(&elem);
+            //object->move((List <Movable> &)objects);
+            //object->draw();
+            //object->live(&elem);
 
         }
         window.display();
