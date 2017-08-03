@@ -9,9 +9,9 @@
 
 sf::RenderWindow window(sf::VideoMode(1920, 1080), "A Swagabitch game");
 
-void Show_Kirill(){
+void Show_Kirill() {
     sf::Texture Kirill;
-    Kirill.loadFromFile("/Users/gregpost/CLionProjects/TOPPRYGA/bg.jpg");
+    Kirill.loadFromFile("/home/fedya/Изображения/Game images/Kirill.jpg");
     sf::Sprite sprite(Kirill);
     window.draw(sprite);
     window.display();
@@ -21,74 +21,51 @@ void Show_Kirill(){
 #include "body_functions.h"
 
 
-
 sf::Vector2i Start;
 sf::Vector2i Now;
 sf::Vector2i Finish;
-bool FirstPress = true, FirstPress1 = true, FirstPress2 = true, StartSeted = false;
 
-//bool FirstKeyDownR() {
-//    if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && FirstPress) {
-//        FirstPress = false;
-//        printf("1");
-//        return true;
-//    } else {
-//        if ((!sf::Mouse::isButtonPressed(sf::Mouse::Right)) && !FirstPress) {
-//            FirstPress = true;
-//            printf("2");
-//        }
-//        return false;
-//    }
-//}
-//bool FirstKeyDownL() {
-//    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-////        FirstPress = false;
-//       printf("1");
-//        return FirstPress;
-//    } else {
-//        if (!FirstPress) {
-//            FirstPress = true;
-//            printf("2");
-//        }
-//        return false;
-//    }
-//}
 
-float Distance(sf::Vector2i a, sf::Vector2i b) {
-    return sqrt(pow (a.x - b.x, 2) + pow (a.y - b.y, 2));
+bool FirstPress = true, FirstPress1 = true, FirstPress2 = true, StartSet = false;
+
+template<typename T>
+T Distance(sf::Vector2<T> a, sf::Vector2<T> b) {
+    return (T) sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 }
-
-
 
 
 class Point {
 public:
     int wave = -1;
     sf::Vector2i point_pos;
-    bool passable = true, allotment = false, partOfJorney = false;
+    bool passable = true,//Указатель на то, что на блоке
+            allotment = false,
+            partOfJorney = false;
 };
 
-class Block: public Point {
+
+class Block {
 public:
     sf::Vector2i FocusOn;
     sf::Texture block_tex;
     sf::Sprite block_spr;
 
     Block() {
-        block_tex.loadFromFile("/Users/gregpost/CLionProjects/Копия TOPPRYGA/block.png");
+        block_tex.loadFromFile("/home/fedya/Изображения/Game images/wall.jpg");
         sf::Sprite sprite(block_tex);
         block_spr = sprite;
         int width = block_tex.getSize().x;
         int height = block_tex.getSize().y;
-        block_spr.setOrigin( width / 2, height / 2);
+        block_spr.setOrigin(width / 2, height / 2);
     }
 
-    void Create (class Point blocks[][16]) {
-        int i, j;
+    void Create(class Point blocks[][16]) {//|Убратть 16
+
         float max = 1000000;
         if (FirstPress1) {
-            for (i = 0; i < 9; i++)
-                for (j = 0; j < 16; j++) {
+            for (int i = 0; i < 9; i++)
+                for (int j = 0; j < 16; j++) {
+                    //Убрать это
                     if (Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos) < max) {
                         max = Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos);
                         sf::Vector2i vector(i, j);
@@ -97,8 +74,10 @@ public:
                 }
             if (blocks[FocusOn.x][FocusOn.y].passable) {
                 blocks[FocusOn.x][FocusOn.y].passable = false;
-                block_spr.setPosition(blocks[FocusOn.x][FocusOn.y].point_pos.x, blocks[FocusOn.x][FocusOn.y].point_pos.y);
-            } else blocks[FocusOn.x][FocusOn.y].passable = true;
+                block_spr.setPosition(blocks[FocusOn.x][FocusOn.y].point_pos.x,
+                                      blocks[FocusOn.x][FocusOn.y].point_pos.y);
+            } else
+                blocks[FocusOn.x][FocusOn.y].passable = true;
         }
         FirstPress1 = false;
     }
@@ -117,9 +96,7 @@ public:
 };
 
 
-
-
-class Traveler: public Point {
+class Traveler : public Point {
 public:
 
     sf::Vector2i FocusOn;
@@ -129,12 +106,12 @@ public:
     sf::Vector2i Start, Finish;
 
     Traveler() {
-        travel_tex.loadFromFile("/Users/gregpost/CLionProjects/Копия TOPPRYGA/traveler.png");
+        travel_tex.loadFromFile("/home/fedya/Изображения/Game images/path.jpg");
         sf::Sprite sprite(travel_tex);
         travel_spr = sprite;
         int width = travel_tex.getSize().x;
         int height = travel_tex.getSize().y;
-        travel_spr.setOrigin( width / 2, height / 2);
+        travel_spr.setOrigin(width / 2, height / 2);
     }
 
     void create(class Point blocks[][16]) {
@@ -143,7 +120,7 @@ public:
         if (FirstPress2) {
             for (i = 0; i < 9; i++)
                 for (j = 0; j < 16; j++) {
-                    if (!StartSeted)
+                    if (!StartSet)
                         blocks[i][j].partOfJorney = false;
                     if (Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos) < min) {
                         min = Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos);
@@ -151,46 +128,46 @@ public:
                         FocusOn = vector;
                     }
                 }
-            if ((blocks[FocusOn.x][FocusOn.y].passable) && !StartSeted) {
-                travel_spr.setPosition(blocks[FocusOn.x][FocusOn.y].point_pos.x, blocks[FocusOn.x][FocusOn.y].point_pos.y);
+            if ((blocks[FocusOn.x][FocusOn.y].passable) && !StartSet) {
+                travel_spr.setPosition(blocks[FocusOn.x][FocusOn.y].point_pos.x,
+                                       blocks[FocusOn.x][FocusOn.y].point_pos.y);
                 Start = FocusOn;
-                StartSeted = true;
+                StartSet = true;
                 blocks[FocusOn.x][FocusOn.y].wave = 0;
-            } else
-                if (StartSeted && (blocks[FocusOn.x][FocusOn.y].passable)) {
-                    StartSeted = false;
-                    sf::Vector2i vector(FocusOn.x, FocusOn.y);
-                    Finish = vector;
-                }
+            } else if (StartSet && (blocks[FocusOn.x][FocusOn.y].passable)) {
+                StartSet = false;
+                sf::Vector2i vector(FocusOn.x, FocusOn.y);
+                Finish = vector;
+            }
 
         }
         FirstPress2 = false;
     }
 
     void Wave(class Point blocks[][16]) {
-        int i, j, k;
-        for (k = 0; k < 400; k++){
-            for (i = 0; i < 9; i++)
-                for (j = 0; j < 16; j++)
-                    if ((blocks[i][j].wave >= 0) && (blocks[i][j].passable)) {
+        for (int k = 0; k < 400; k++) {
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 16; j++) {
+                    if ((blocks[i][j].wave >= 0) && (blocks[i][j].passable)) {//Попроще
                         if ((blocks[i - 1][j].wave < 0) && blocks[i - 1][j].passable)
                             blocks[i - 1][j].wave = blocks[i][j].wave + 1;
                         if ((blocks[i][j - 1].wave < 0) && blocks[i][j - 1].passable)
                             blocks[i][j - 1].wave = blocks[i][j].wave + 1;
-                        if ((blocks[i + 1][j].wave < 0) && blocks[i + 1][j].passable )
+                        if ((blocks[i + 1][j].wave < 0) && blocks[i + 1][j].passable)
                             blocks[i + 1][j].wave = blocks[i][j].wave + 1;
                         if ((blocks[i][j + 1].wave < 0) && blocks[i][j + 1].passable)
                             blocks[i][j + 1].wave = blocks[i][j].wave + 1;
-//                        if ((blocks[i - 1][j - 1].wave < 0) && blocks[i - 1][j - 1].passable)
-//                            blocks[i - 1][j - 1].wave = blocks[i][j].wave + 1;
-//                        if ((blocks[i - 1][j + 1].wave < 0) && blocks[i - 1][j + 1].passable)
-//                            blocks[i - 1][j + 1].wave = blocks[i][j].wave + 1;
-//                        if ((blocks[i + 1][j - 1].wave < 0) && blocks[i + 1][j - 1].passable)
-//                            blocks[i + 1][j - 1].wave = blocks[i][j].wave + 1;
-//                        if ((blocks[i + 1][j + 1].wave < 0) && blocks[i + 1][j + 1].passable)
-//                            blocks[i + 1][j + 1].wave = blocks[i][j].wave + 1;
+//                      if ((blocks[i - 1][j - 1].wave < 0) && blocks[i - 1][j - 1].passable)
+//                          blocks[i - 1][j - 1].wave = blocks[i][j].wave + 1;
+//                      if ((blocks[i - 1][j + 1].wave < 0) && blocks[i - 1][j + 1].passable)
+//                          blocks[i - 1][j + 1].wave = blocks[i][j].wave + 1;
+//                      if ((blocks[i + 1][j - 1].wave < 0) && blocks[i + 1][j - 1].passable)
+//                          blocks[i + 1][j - 1].wave = blocks[i][j].wave + 1;
+//                      if ((blocks[i + 1][j + 1].wave < 0) && blocks[i + 1][j + 1].passable)
+//                          blocks[i + 1][j + 1].wave = blocks[i][j].wave + 1;
                     }
-
+                }
+            }
         }
     }
 
@@ -201,18 +178,15 @@ public:
                 Finish.y = Finish.y - 1;
                 travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
                 blocks[Finish.x][Finish.y].partOfJorney = true;
-            } else
-            if (blocks[Finish.x][Finish.y + 1].wave - blocks[Finish.x][Finish.y].wave == -1) {
+            } else if (blocks[Finish.x][Finish.y + 1].wave - blocks[Finish.x][Finish.y].wave == -1) {
                 Finish.y = Finish.y + 1;
                 travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
                 blocks[Finish.x][Finish.y].partOfJorney = true;
-            } else
-            if (blocks[Finish.x - 1][Finish.y].wave - blocks[Finish.x][Finish.y].wave == -1) {
+            } else if (blocks[Finish.x - 1][Finish.y].wave - blocks[Finish.x][Finish.y].wave == -1) {
                 Finish.x = Finish.x - 1;
                 travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
                 blocks[Finish.x][Finish.y].partOfJorney = true;
-            } else
-            if (blocks[Finish.x + 1][Finish.y].wave - blocks[Finish.x][Finish.y].wave == -1) {
+            } else if (blocks[Finish.x + 1][Finish.y].wave - blocks[Finish.x][Finish.y].wave == -1) {
                 Finish.x = Finish.x + 1;
                 travel_spr.setPosition(blocks[Finish.x][Finish.y].point_pos.x, blocks[Finish.x][Finish.y].point_pos.y);
                 blocks[Finish.x][Finish.y].partOfJorney = true;
@@ -256,12 +230,7 @@ public:
 };
 
 
-
-
-
-
 class Mysh {
-
 
 public:
     void Allot(sf::Sprite Allot_s) {
@@ -292,23 +261,42 @@ public:
 };
 
 
-class Engine: public Mysh, public Point {
+class Engine : public Mysh {
 public:
+
 
     sf::Texture background_image;
     sf::Texture Allot_t;
     Point blocks[9][16];
-    Mysh focus;
     Block AlgoritmLi;
 
-    char bg_path[100] = "/Users/gregpost/CLionProjects/TOPPRYGA/bg.jpg";
+    char bg_path[100] = "/home/fedya/Изображения/Game images/bg.jpg";
 
     void run();
 
-    Engine(List<Physical_Body> &objects) :objects(objects) {
-        int i, j;
+    Engine(List<Physical_Body> &objects) : objects(objects) {
+
+        blocks[0][0].point_pos.x = 60;
+        blocks[0][0].point_pos.y = 60;
+        for (int i = 0, j = 0; i < 9; i++) {
+            if ((i != 0) || (j != 0)) {
+                blocks[i][0].point_pos.y = blocks[i - 1][0].point_pos.y + 120;
+                blocks[i][0].point_pos.x = blocks[i - 1][0].point_pos.x;
+            }
+            for (j = 1; j < 16; j++) {
+                if ((i != 0) || (j != 0)) {
+                    blocks[i][j].point_pos.x = blocks[i][j - 1].point_pos.x + 120;
+                    blocks[i][j].point_pos.y = blocks[i][j - 1].point_pos.y;
+                }
+            }
+        }
+        for (int i = 0; i < 9; i++)
+            for (int j = 0; j < 16; j++)
+                if (((i < 1) || (i > 7)) || ((j < 1) || (j > 14)))
+                    blocks[i][j].passable = false;
+
         background_image.loadFromFile(bg_path);
-        Allot_t.loadFromFile("/Users/gregpost/CLionProjects/Копия TOPPRYGA/Allot.png");
+        Allot_t.loadFromFile("/home/fedya/Изображения/Game images/texture.jpg");
 
     };
 
@@ -332,30 +320,6 @@ void Engine::run() {
     window.draw(background_sprite);
     window.display();
 
-    int i, j;
-    blocks[0][0].point_pos.x = 60;
-    blocks[0][0].point_pos.y = 60;
-    blocks[0][0].passable = true;
-    blocks[0][0].allotment = false;
-    i = j = 0;
-    for (i = 0; i < 9; i++) {
-        if ((i != 0) || (j != 0)) {
-            blocks[i][0].point_pos.y = blocks[i - 1][0].point_pos.y + 120;
-            blocks[i][0].point_pos.x = blocks[i - 1][0].point_pos.x;
-        }
-        for (j = 1; j < 16; j++) {
-            if ((i != 0) || (j != 0)) {
-                blocks[i][j].point_pos.x = blocks[i][j - 1].point_pos.x + 120;
-                blocks[i][j].point_pos.y = blocks[i][j - 1].point_pos.y;
-                blocks[i][j].passable = true;
-                blocks[i][j].allotment = false;
-            }
-        }
-    }
-    for (i = 0; i < 9; i++)
-        for (j = 0; j < 16; j++)
-            if (((i < 1) || (i > 7)) || ((j < 1) || (j > 14)))
-                blocks[i][j].passable = false;
 
     while (window.isOpen()) {
         window.clear();
@@ -369,12 +333,12 @@ void Engine::run() {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
             break;
 
-        //clock.restart();
+
         window.draw(background_sprite);
-      if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-            focus.Allot(Allot_s);
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            Allot(Allot_s);
             bob.create(blocks);
-            if (!StartSeted) {
+            if (!StartSet) {
                 bob.Wave(blocks);
                 bob.GoBack(blocks);
             }
@@ -387,10 +351,11 @@ void Engine::run() {
 
         bob.ShowJorney(blocks);
 
-       if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-           AlgoritmLi.Create(blocks);
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+            AlgoritmLi.Create(blocks);
         } else {
-            if (!FirstPress1) FirstPress1 = true;
+            if (!FirstPress1)
+                FirstPress1 = true;
         }
         AlgoritmLi.ShowBlocks(blocks);
 
