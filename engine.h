@@ -9,9 +9,11 @@
 
 sf::RenderWindow window(sf::VideoMode(1920, 1080), "A Swagabitch game");
 
+std::string Images_Dir("/home/fedya/Изображения/Game images/");
+
 void Show_Kirill() {
     sf::Texture Kirill;
-    Kirill.loadFromFile("/home/fedya/Изображения/Game images/Kirill.jpg");
+    Kirill.loadFromFile(Images_Dir + "Kirill.jpg");
     sf::Sprite sprite(Kirill);
     window.draw(sprite);
     window.display();
@@ -28,9 +30,10 @@ sf::Vector2i Finish;
 
 bool FirstPress = true, FirstPress1 = true, FirstPress2 = true, StartSet = false;
 
+
 template<typename T>
-T Distance(sf::Vector2<T> a, sf::Vector2<T> b) {
-    return (T) sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
+double Distance(sf::Vector2<T> a, sf::Vector2<T> b) {//Теперь работает для любых векторов. Например, sf::Vector2i, sf::Vector2f (но они оба должны быть одинакового типа)
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 }
 
 
@@ -38,7 +41,7 @@ class Point {
 public:
     int wave = -1;
     sf::Vector2i point_pos;
-    bool passable = true,//Указатель на то, что на блоке
+    bool passable = true,//Указатель на то, что на блоке (тип сделать лучше как physical_body, т.к. тогда не будет проблем, если там то, что наследуется из тела)
             allotment = false,
             partOfJorney = false;
 };
@@ -51,7 +54,7 @@ public:
     sf::Sprite block_spr;
 
     Block() {
-        block_tex.loadFromFile("/home/fedya/Изображения/Game images/wall.jpg");
+        block_tex.loadFromFile(Images_Dir + "wall.jpg");
         sf::Sprite sprite(block_tex);
         block_spr = sprite;
         int width = block_tex.getSize().x;
@@ -59,7 +62,7 @@ public:
         block_spr.setOrigin(width / 2, height / 2);
     }
 
-    void Create(class Point blocks[][16]) {//|Убратть 16
+    void Create(class Point blocks[][16]) {
 
         float max = 1000000;
         if (FirstPress1) {
@@ -106,7 +109,7 @@ public:
     sf::Vector2i Start, Finish;
 
     Traveler() {
-        travel_tex.loadFromFile("/home/fedya/Изображения/Game images/path.jpg");
+        travel_tex.loadFromFile(Images_Dir + "path.jpg");
         sf::Sprite sprite(travel_tex);
         travel_spr = sprite;
         int width = travel_tex.getSize().x;
@@ -122,7 +125,7 @@ public:
                 for (j = 0; j < 16; j++) {
                     if (!StartSet)
                         blocks[i][j].partOfJorney = false;
-                    if (Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos) < min) {
+                    if (Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos) < min) {//Это всё тоже
                         min = Distance(sf::Mouse::getPosition(window), blocks[i][j].point_pos);
                         sf::Vector2i vector(i, j);
                         FocusOn = vector;
@@ -144,7 +147,7 @@ public:
         FirstPress2 = false;
     }
 
-    void Wave(class Point blocks[][16]) {
+    void Wave(/*class*/ Point blocks[][16]) {//Зачем в таких местах писать class? Так делают только в структурах, когда не знают про typedef
         for (int k = 0; k < 400; k++) {
             for (int i = 0; i < 9; i++) {
                 for (int j = 0; j < 16; j++) {
@@ -270,7 +273,7 @@ public:
     Point blocks[9][16];
     Block AlgoritmLi;
 
-    char bg_path[100] = "/home/fedya/Изображения/Game images/bg.jpg";
+    std::string bg_path = Images_Dir + "bg.jpg";
 
     void run();
 
@@ -296,7 +299,7 @@ public:
                     blocks[i][j].passable = false;
 
         background_image.loadFromFile(bg_path);
-        Allot_t.loadFromFile("/home/fedya/Изображения/Game images/texture.jpg");
+        Allot_t.loadFromFile(Images_Dir + "texture.jpg");
 
     };
 
@@ -317,11 +320,19 @@ void Engine::run() {
     window.clear();
     sf::Sprite background_sprite(background_image);
     sf::Sprite Allot_s(Allot_t);
+
     window.draw(background_sprite);
     window.display();
 
 
+
+    ////
+    sf::Clock clock;
+    ////
     while (window.isOpen()) {
+        ////
+        clock.restart();
+        ////
         window.clear();
         sf::Event event;
 
@@ -359,11 +370,9 @@ void Engine::run() {
         }
         AlgoritmLi.ShowBlocks(blocks);
 
-
-
-
-        // window.draw(health_line);
-        //int time = (int) clock.getElapsedTime().asMicroseconds();
+        ////
+        long long time = clock.getElapsedTime().asMicroseconds();
+        ////
         for (auto elem = objects.first(); elem != objects.final(); elem++) {
             //elem.dump();
             auto object = (Character *) elem.data_;
@@ -372,9 +381,11 @@ void Engine::run() {
             //object->move((List <Movable> &)objects);
             //object->draw();
             //object->live(&elem);
-
         }
         window.display();
+        ////
+        for (;clock.getElapsedTime().asMicroseconds() - time < 5e4;){}
+        ////
     }
 }
 
