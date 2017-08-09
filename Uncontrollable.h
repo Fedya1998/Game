@@ -9,18 +9,18 @@
 
 #endif //GAME_UNCONTROLLABLE_H
 
-class Uncontrollable:public Textures{
+Textures textures;
+class Uncontrollable{
 protected:
-
     sf::Vector2f coord;
     size_t width = 0;
     size_t height = 0;
 
     sf::Sprite sprite_;
 public:
-    int type = type_empty;
-    Uncontrollable(int type) : Textures(), type(type) {
-        sf::Texture * texture = Get_Texture(this);
+    int type = Textures::type_empty;
+    Uncontrollable(int type) : type(type) {
+        sf::Texture * texture = textures.Get_Texture(this);
         sf::Sprite sprite(*texture);
         sprite_ = sprite;
         width = texture->getSize().x;
