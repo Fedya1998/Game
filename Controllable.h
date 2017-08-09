@@ -9,6 +9,8 @@
 #include <list_h.h>
 #include <SFML/Graphics.hpp>
 
+#include "Uncontrollable.h"
+
 #ifndef GAME_CHARACTER_H
 #define GAME_CHARACTER_H
 
@@ -16,65 +18,59 @@
 
 const int INF_MASS = -1;
 
-class Physical_Body {
+class Controllable :public Uncontrollable{
 protected:
-    sf::Vector2f coord;
-    size_t width = 0;
-    size_t height = 0;
     char *name = NULL;
-    sf::Texture texture_;
-    sf::Sprite sprite_;
     float mass = INF_MASS;
 public:
-    Physical_Body(char *name, char *img_path) : name(name) {
-        texture_.loadFromFile(img_path);
-        sf::Sprite sprite(texture_);
-        sprite_ = sprite;
-        width = texture_.getSize().x;
-        height = texture_.getSize().y;
-        sprite_.setOrigin(width / 2, height / 2);
-    }
-    virtual ~Physical_Body() {
+    Controllable(char *name, int type) : Uncontrollable(type), name(name) {}
+    virtual ~Controllable() {
         free(name);
     }
+
     virtual void draw();
-    bool intersection(Physical_Body &Body);
-    float distance(Physical_Body &Body);
+    bool intersection(Controllable &Body);
+    float distance(Controllable &Body);
     virtual void dump() const;
 
-    bool operator ==(const Physical_Body &right){
+    bool operator ==(const Controllable &right){
         return coord.x == right.coord.x && right.coord.y == coord.y && !strcmp(name, right.name);
     }
 
-    bool operator !=(const Physical_Body &right) {
+    bool operator !=(const Controllable &right) {
         return !(*this==right);
     }
 
 };
 
-class Movable : public Physical_Body {
+class Movable : public Controllable {
 protected:
     sf::Vector2f v;
     sf::Vector2f a;
     size_t v_max = 0;
 public:
-    Movable(char *name, char *img_path) : Physical_Body (name, img_path) {}
+    Movable(char *name, int type) : Controllable (name, type) {}
     void move(List<Movable> &objects);
-    void collide(Physical_Body &Body);
+    void collide(Controllable &Body);
     void collide(Movable &Mvbl);
 };
 
 class Character : public Movable {
 protected:
+    enum types{
+
+    };
     float angle = 0;
     size_t health = 0;
     size_t stamina = 0;
     size_t base_damage = 0;
     size_t cooldown = 0;
 public:
-    Character(char *name, char *img_path) : Movable (name, img_path) {}
+    bool selected = false;
 
 
+public:
+    Character(char *name, int type) : Movable (name, type) {}
 
     void suffer(size_t damage);
 
@@ -82,11 +78,9 @@ public:
 
     virtual void control() = 0;
 
-    virtual void logic(List<Physical_Body> &objects) = 0;
+    virtual void logic(List<Controllable> &objects) = 0;
 
-    void live(List_Elem<Physical_Body> * elem);
-
-    virtual void die(List_Elem<Physical_Body> *elem) = 0;
+    void live(List_Elem<Controllable> * elem);
 
     void dump() const override;
 
@@ -98,11 +92,14 @@ public:
     bool operator!=(const Character &right) const {
         return !(*this == right);
     }
+
+protected:
+    virtual void die(List_Elem<Controllable> *elem) = 0;
 };
 
 class Super_Hero : public Character {
 public:
-    Super_Hero(char *name, char *img_path) : Character(name, img_path) {
+    Super_Hero(char *name, int type) : Character(name, type){
         health = 100;
         stamina = 100;
         v_max = 100;
@@ -114,17 +111,17 @@ public:
 
     void control() override;
 
-    void logic(List<Physical_Body> &objects) override{
+    void logic(List<Controllable> &objects) override{
 
     }
 
-    void die(List_Elem<Physical_Body> *elem) override;
+    void die(List_Elem<Controllable> *elem) override;
 };
 
 class Enemy : public Character {
 public:
     //Enemy() : Character(){}
-    Enemy(char *name, char *img_path) : Character(name, img_path) {
+    Enemy(char *name, int type) : Character(name, type) {
         health = 100;
         stamina = 100;
         coord.x = 1000;
@@ -144,7 +141,7 @@ protected:
 
     void follow(Character &Char);
 
-    void logic(List<Physical_Body> &objects) override;
+    void logic(List<Controllable> &objects) override;
 
-    void die(List_Elem<Physical_Body> *elem) override;
+    void die(List_Elem<Controllable> *elem) override;
 };

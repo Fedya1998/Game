@@ -2,28 +2,28 @@
 // Created by fedya on 24.07.17.
 //
 
-#include "Character.h"
+#include "Controllable.h"
 
 #ifndef GAME_BODY_FUNCTIONS_H
 #define GAME_BODY_FUNCTIONS_H
 
 #endif //GAME_BODY_FUNCTIONS_H
 
-void Physical_Body::draw() {
+void Controllable::draw() {
     sprite_.setPosition(coord);
     window.draw(sprite_);
 }
 
-float Physical_Body::distance(Physical_Body &Body) {
+float Controllable::distance(Controllable &Body) {
     return (float) sqrt(pow(coord.x - Body.coord.x, 2) + pow(coord.y - Body.coord.y, 2));
 }
 
-bool Physical_Body::intersection(Physical_Body &Body) {
+bool Controllable::intersection(Controllable &Body) {
     return 2 * fabsf(coord.x - Body.coord.x) < width + Body.width &
            2 * fabsf(coord.y - Body.coord.y) < height + Body.height;
 }
 
-void Physical_Body::dump() const {
+void Controllable::dump() const {
     printFe("name %\nx %\ny %\n", name, coord.x, coord.y);
 }
 
@@ -60,7 +60,7 @@ void Movable::move(List<Movable> &objects) {
         v.y = 0;
 }
 
-void Movable::collide(Physical_Body &Body) {
+void Movable::collide(Controllable &Body) {
     const float alpha = 0.5;//This part of energy goes to deformation and other shit
     v *= sqrtf(1 - alpha);//We've met a wall
 }
@@ -79,12 +79,12 @@ void Character::dump() const{
 }
 
 void Character::draw(){
-    Physical_Body::draw();
+    Controllable::draw();
 
 }
 
 
-void Character::live(List_Elem<Physical_Body> *elem) {
+void Character::live(List_Elem<Controllable> *elem) {
     if (health <= 0)
         die(elem);
 }
@@ -94,8 +94,7 @@ void Character::suffer(size_t damage) {
 }
 
 
-void Super_Hero::die(List_Elem<Physical_Body> *elem){
-    Show_Kirill();
+void Super_Hero::die(List_Elem<Controllable> *elem){
     getchar();
 }
 
@@ -143,7 +142,7 @@ void Enemy::attack(Character &Char) {
     Char.suffer(base_damage);
 }
 
-void Enemy::logic(List<Physical_Body> &objects) {
+void Enemy::logic(List<Controllable> &objects) {
     Super_Hero &Hero = (Super_Hero &) *objects[0].data_;
     if (distance(Hero) < distance_to_see)
         follow(Hero);
@@ -153,7 +152,7 @@ void Enemy::logic(List<Physical_Body> &objects) {
     }
 }
 
-void Enemy::die(List_Elem<Physical_Body> *elem){
+void Enemy::die(List_Elem<Controllable> *elem){
     delete elem;
 }
 
