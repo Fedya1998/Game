@@ -9,21 +9,36 @@
 #include <list_h.h>
 #include <SFML/Graphics.hpp>
 
-#include "Uncontrollable.h"
-
 #ifndef GAME_CHARACTER_H
 #define GAME_CHARACTER_H
 
 #endif //GAME_CHARACTER_H
 
+Textures textures;
 const int INF_MASS = -1;
 
-class Controllable :public Uncontrollable{
+class Controllable{
 protected:
+    sf::Vector2f coord;
+    size_t width = 0;
+    size_t height = 0;
+
+    sf::Sprite sprite_;
+
     char *name = NULL;
     float mass = INF_MASS;
 public:
-    Controllable(char *name, int type) : Uncontrollable(type), name(name) {}
+    int type = Textures::type_empty;
+
+
+    Controllable(char *name, int type) : name(name), type(type) {
+        sf::Texture *texture = textures.Get_Texture(this);
+        sf::Sprite sprite(*texture);
+        sprite_ = sprite;
+        width = texture->getSize().x;
+        height = texture->getSize().y;
+        sprite_.setOrigin(width / 2, height / 2);
+    }
     virtual ~Controllable() {
         free(name);
     }

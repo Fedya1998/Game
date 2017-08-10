@@ -40,7 +40,7 @@ class Block {
 public:
     sf::Vector2i point_pos;
 
-    Uncontrollable surface = Uncontrollable(0);
+    int surface = Textures::type_empty;
     Controllable * afloat = NULL;
 
     Block() {
@@ -229,9 +229,8 @@ public:
 
     void run();
 
-    Engine(const char * map_name) {
+    Engine() {
         objects = new List<Controllable>;
-        map = new List<Uncontrollable>(map_name);
 
 
         blocks[0][0].point_pos.x = block_size.x / 2;
@@ -260,12 +259,12 @@ public:
 
     };
 
+    void Load_Map(const char * map_name);
+
     ~Engine() {
         delete objects;
-        delete map;
     };
 
-    List<Uncontrollable> *map = NULL;
     List<Controllable> *objects = NULL;
 
 private:
@@ -352,6 +351,10 @@ void Engine::run() {
         for (;clock.getElapsedTime().asMicroseconds() - time < 5e4;){}
 
     }
+}
+
+void Engine::Load_Map(const char *map_name) {
+
 }
 
 
