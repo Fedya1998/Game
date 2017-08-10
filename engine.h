@@ -341,9 +341,9 @@ void Engine::run() {
                 auto object = (Character *) elem.data_;
                 object->logic(*objects);
                 object->control();
-                //object->move((List <Movable> &)objects);
-                //object->draw();
-                //object->live(&elem);
+                object->move(*objects);
+                object->draw();
+                object->live();
             }
         }
         window.display();

@@ -27,7 +27,16 @@ void Controllable::dump() const {
     printFe("name %\nx %\ny %\n", name, coord.x, coord.y);
 }
 
-void Movable::move(List<Movable> &objects) {
+void Controllable::live() {
+    if (health <= 0)
+        die();
+}
+
+void Controllable::die() {
+    delete list_elem;
+}
+
+void Movable::move(List<Controllable> &objects) {
 
     sf::Vector2f coord_old(coord);
     coord.x += v.x * 0.01;
@@ -82,20 +91,8 @@ void Character::draw(){
     Controllable::draw();
 
 }
-
-
-void Character::live(List_Elem<Controllable> *elem) {
-    if (health <= 0)
-        die(elem);
-}
-
 void Character::suffer(size_t damage) {
     health -= damage;
-}
-
-
-void Super_Hero::die(List_Elem<Controllable> *elem){
-    getchar();
 }
 
 void Super_Hero::control() {
@@ -150,10 +147,6 @@ void Enemy::logic(List<Controllable> &objects) {
         //printFe("Ready to attack\n");
         attack(Hero);
     }
-}
-
-void Enemy::die(List_Elem<Controllable> *elem){
-    delete elem;
 }
 
 void Enemy::follow(Character &Char) {

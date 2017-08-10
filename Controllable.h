@@ -22,11 +22,14 @@ protected:
     sf::Vector2f coord;
     size_t width = 0;
     size_t height = 0;
+    size_t health = 0;
 
     sf::Sprite sprite_;
 
     char *name = NULL;
     float mass = INF_MASS;
+
+    List_Elem<Controllable> * list_elem = NULL;
 public:
     int type = Textures::type_empty;
 
@@ -48,6 +51,9 @@ public:
     float distance(Controllable &Body);
     virtual void dump() const;
 
+    void live();
+    void die();
+
     bool operator ==(const Controllable &right){
         return coord.x == right.coord.x && right.coord.y == coord.y && !strcmp(name, right.name);
     }
@@ -65,9 +71,9 @@ protected:
     size_t v_max = 0;
 public:
     Movable(char *name, int type) : Controllable (name, type) {}
-    void move(List<Movable> &objects);
+    void move(List<Controllable> &objects);
     void collide(Controllable &Body);
-    void collide(Movable &Mvbl);
+    void collide(Movable &movable);
 };
 
 class Character : public Movable {
@@ -76,7 +82,6 @@ protected:
 
     };
     float angle = 0;
-    size_t health = 0;
     size_t stamina = 0;
     size_t base_damage = 0;
     size_t cooldown = 0;
@@ -95,7 +100,7 @@ public:
 
     virtual void logic(List<Controllable> &objects) = 0;
 
-    void live(List_Elem<Controllable> * elem);
+
 
     void dump() const override;
 
@@ -108,8 +113,6 @@ public:
         return !(*this == right);
     }
 
-protected:
-    virtual void die(List_Elem<Controllable> *elem) = 0;
 };
 
 class Super_Hero : public Character {
@@ -129,8 +132,6 @@ public:
     void logic(List<Controllable> &objects) override{
 
     }
-
-    void die(List_Elem<Controllable> *elem) override;
 };
 
 class Enemy : public Character {
@@ -157,6 +158,4 @@ protected:
     void follow(Character &Char);
 
     void logic(List<Controllable> &objects) override;
-
-    void die(List_Elem<Controllable> *elem) override;
 };
