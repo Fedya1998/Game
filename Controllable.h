@@ -122,7 +122,7 @@ public:
         mass = 100;
     }
 
-    //~Super_Hero() {}
+    ~Super_Hero() {}
 
     void control() override;
 

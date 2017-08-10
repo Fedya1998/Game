@@ -21,7 +21,7 @@ const sf::Vector2i block_size(120, 120);
 const int width = 16, height = 9;
 
 template<typename T>
-double Distance(sf::Vector2<T> a, sf::Vector2<T> b) {//Теперь работает для любых векторов. Например, sf::Vector2i, sf::Vector2f (но они оба должны быть одинакового типа)
+double Distance(sf::Vector2<T> a, sf::Vector2<T> b) {
     return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 }
 

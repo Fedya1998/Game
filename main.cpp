@@ -11,14 +11,14 @@
 
 #include "engine.h"
 
-
 //using namespace std;
 
 
 
 int main() {
 
-    List <Physical_Body> super_list;
+    List <Controllable> super_list;
+    /*
     char img_path[100] = "/home/fedya/Изображения/Game images/deer.png";
     char * name1 = (char *) calloc(sizeof(char), strlen("Kirill") + 1);
     strcpy(name1, "Kirill");
@@ -28,8 +28,9 @@ int main() {
     char * name2 = (char *) calloc(sizeof(char), strlen("Zombie") + 1);
     strcpy(name2, "Zombie");
     super_list.append(new Enemy(name2, img_path2));
+     */
 
-    Engine engine = Engine(super_list);
+    Engine engine = Engine();
 
     engine.run();
 

@@ -1,6 +1,0 @@
-tex(grass, jpg)
-tex(sand, jpg)
-tex(mountain, jpg)
-tex(water, jpg)
-tex(building, png)
-tex(character, png)

@@ -1,0 +1,2 @@
+tex(building, png)
+tex(character, png)

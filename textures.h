@@ -17,23 +17,26 @@ protected:
 #define tex(name, what)\
     string name##_path = #name;
 
-#include "textures_and_paths.txt"
+#include "textures_and_paths.h"
 #undef tex
 };
 
 class Textures : public Texture_Names{
 public:
-
     enum types{
 #define tex(name, num) type_##name,
-#include "textures_and_paths.txt"
+#include "textures_passable.txt"
+        type_passable,
+#include "textures_impassable.txt"
+        type_impassable,
+#include "textures_other.txt"
 #undef tex
         type_empty
     };
 
 #define tex(name, what) sf::Texture name##_texture;
 
-#include "textures_and_paths.txt"
+#include "textures_and_paths.h"
 #undef tex
 
     Textures():Texture_Names(){
@@ -41,7 +44,7 @@ public:
         name##_path += #what;\
         name##_texture.loadFromFile(name##_path);\
 
-#include "textures_and_paths.txt"
+#include "textures_and_paths.h"
 #undef tex
     };
     ~Textures(){};
@@ -50,7 +53,7 @@ public:
         switch (obj->type){
 #define tex(name, what) case type_##name : {return & name##_texture;}
 
-#include "textures_and_paths.txt"
+#include "textures_and_paths.h"
 #undef tex
             default:{
                 printf("Unknown type\n");

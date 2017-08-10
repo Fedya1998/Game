@@ -15,7 +15,7 @@ void Controllable::draw() {
 }
 
 float Controllable::distance(Controllable &Body) {
-    return (float) sqrt(pow(coord.x - Body.coord.x, 2) + pow(coord.y - Body.coord.y, 2));
+    return sqrt(pow(coord.x - Body.coord.x, 2) + pow(coord.y - Body.coord.y, 2));
 }
 
 bool Controllable::intersection(Controllable &Body) {

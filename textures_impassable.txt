@@ -1,0 +1,2 @@
+tex(mountain, jpg)
+tex(water, jpg)

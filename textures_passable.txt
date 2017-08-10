@@ -1,0 +1,2 @@
+tex(grass, jpg)
+tex(sand, jpg)
