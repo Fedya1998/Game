@@ -37,7 +37,7 @@ void Movable::move(List<Movable> &objects) {
     for (auto elem = objects.first(); elem != objects.final(); elem++){
         auto object = elem.data_;
         if (intersection(* object)){
-            if (object == this | collision)
+            if (collision | object == this)
                 continue;
             printf("Pizdec intersection sooqa with\n");
             object->dump();
