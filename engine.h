@@ -9,64 +9,54 @@
 
 sf::RenderWindow window(sf::VideoMode(1920, 1080), "A Swagabitch game");
 
-std::string Images_Dir("/Users/gregpost/CLionProjects/Копия TOPPRYGA/");
-
-void Show_Kirill() {
-    sf::Texture Kirill;
-    Kirill.loadFromFile(Images_Dir + "Kirill.jpg");
-    sf::Sprite sprite(Kirill);
-    window.draw(sprite);
-    window.display();
-}
-
 #include <list.h>
-#include "body_functions.h"
+#include "Controllable.h"
+#include <math.h>
 
 
 sf::Vector2i Start;
 sf::Vector2i Now;
 sf::Vector2i Finish;
-sf::Vector2u size = window.getSize();
-const unsigned int width = size.x / 120, height = size.y / 120;
-
-
-bool FirstPress = true, FirstPress1 = true, FirstPress2 = true, StartSet = false;
-
+const sf::Vector2u size = window.getSize();
+const sf::Vector2i block_size(120, 120);
+const int width = 16, height = 9;
 
 template<typename T>
-double Distance(sf::Vector2<T> a, sf::Vector2<T> b) {//Теперь работает для любых векторов. Например, sf::Vector2i, sf::Vector2f (но они оба должны быть одинакового типа)
+double Distance(sf::Vector2<T> a, sf::Vector2<T> b) {
     return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 }
 
-
+/*
 class Point {
 public:
     int wave = -1;
     sf::Vector2i point_pos;
-    bool passable = true,//Указатель на то, что на блоке (тип сделать лучше как physical_body, т.к. тогда не будет проблем, если там то, что наследуется из тела)
+    bool passable = true,//Указатель на то, что на блоке
             allotment = false,
             partOfJorney = false;
 };
 
-
+*/
 class Block {
 public:
-    sf::Vector2i FocusOn;
-    sf::Texture block_tex;
-    sf::Sprite block_spr;
+    sf::Vector2i point_pos;
+
+    int surface = Textures::type_empty;
+    Controllable * afloat = NULL;
 
     Block() {
-        block_tex.loadFromFile(Images_Dir + "wall.png");
+        /*
+        block_tex.loadFromFile(Images_Dir + "wall.jpg");
         sf::Sprite sprite(block_tex);
         block_spr = sprite;
         int Block_width = block_tex.getSize().x;
         int Block_height = block_tex.getSize().y;
         block_spr.setOrigin(Block_width / 2, Block_height / 2);
+         */
     }
-
+/*
     void Create(class Point blocks[][width]) {
 
-        float max = 1000000;
         if (FirstPress1) {
             sf::Vector2i vector(sf::Mouse::getPosition(window).y / 120, sf::Mouse::getPosition(window).x / 120); // переделал
             FocusOn = vector;
@@ -89,9 +79,10 @@ public:
                     window.draw(block_spr);
                 }
     }
+    */
 };
 
-
+/*
 class Traveler : public Point {
 public:
 
@@ -102,7 +93,7 @@ public:
     sf::Vector2i Start, Finish;
 
     Traveler() {
-        travel_tex.loadFromFile(Images_Dir + "path.png");
+        travel_tex.loadFromFile(Images_Dir + "path.jpg");
         sf::Sprite sprite(travel_tex);
         travel_spr = sprite;
         int width = travel_tex.getSize().x;
@@ -110,11 +101,9 @@ public:
         travel_spr.setOrigin(width / 2, height / 2);
     }
 
-    void create(class Point blocks[][width]) {
-        int i, j;
-        float min = 1000000;
+    void create(Point blocks[][width]) {
         if (FirstPress2) {
-            for (i = 0; i < height; i++)
+            for (int i = 0, j = 0; i < height; i++)
                 for (j = 0; j < width; j++)
                     blocks[i][j].partOfJorney = false;
 
@@ -138,7 +127,7 @@ public:
         FirstPress2 = false;
     }
 
-    void Wave(/*class*/ Point blocks[][width]) {//Зачем в таких местах писать class? Так делают только в структурах, когда не знают про typedef
+    void Wave(Point blocks[][width]) {//Зачем в таких местах писать class? Так делают только в структурах, когда не знают про typedef
         int OgrSv = 0;
         do {
             OgrSv++;
@@ -160,7 +149,7 @@ public:
         } while (blocks[Finish.x][Finish.y].wave == -1);
     }
 
-    void GoBack(class Point blocks[][width]) {
+    void GoBack(Point blocks[][width]) {
         blocks[Finish.x][Finish.y].partOfJorney = true;
         int OgrSv = 0;
         do {
@@ -185,7 +174,7 @@ public:
                 blocks[i][j].wave = -1;
     }
 
-    void ShowJorney(class Point blocks[][width]) {
+    void ShowJorney(Point blocks[][width]) {
         int i, j;
         for (i = 0; i < height; i++)
             for (j = 0; j < width; j++)
@@ -198,8 +187,9 @@ public:
     }
 };
 
-
+*/
 class Mysh {
+    bool FirstPress;
 
 public:
     void Allot(sf::Sprite Allot_s) {
@@ -232,56 +222,60 @@ public:
 
 class Engine : public Mysh {
 public:
-
-
     sf::Texture background_image;
+    Block blocks[width][height];
     sf::Texture Allot_t;
-    Point blocks[height][width];
-    Block AlgoritmLi;
 
-    std::string bg_path = Images_Dir + "bg.jpg";
+    std::string bg_path = Images_Dir + "bg.png";
 
-    void run();
+    virtual void run();
 
-    Engine(List<Physical_Body> &objects) : objects(objects) {
-        blocks[0][0].point_pos.x = 60;
-        blocks[0][0].point_pos.y = 60;
+    Engine() {
+        objects = new List<Controllable>;
+
+
+        blocks[0][0].point_pos.x = block_size.x / 2;
+        blocks[0][0].point_pos.y = block_size.y / 2;
         for (int i = 0, j = 0; i < height; i++) {
             if ((i != 0) || (j != 0)) {
-                blocks[i][0].point_pos.y = blocks[i - 1][0].point_pos.y + 120;
+                blocks[i][0].point_pos.y = blocks[i - 1][0].point_pos.y + block_size.y;
                 blocks[i][0].point_pos.x = blocks[i - 1][0].point_pos.x;
             }
             for (j = 1; j < width; j++) {
                 if ((i != 0) || (j != 0)) {
-                    blocks[i][j].point_pos.x = blocks[i][j - 1].point_pos.x + 120;
+                    blocks[i][j].point_pos.x = blocks[i][j - 1].point_pos.x + block_size.x;
                     blocks[i][j].point_pos.y = blocks[i][j - 1].point_pos.y;
                 }
             }
         }
+        /*
         for (int i = 0; i < height; i++)
             for (int j = 0; j < width; j++)
                 if (((i < 1) || (i > 7)) || ((j < 1) || (j > 14)))
                     blocks[i][j].passable = false;
+        */
 
         background_image.loadFromFile(bg_path);
         Allot_t.loadFromFile(Images_Dir + "texture.png");
 
     };
 
-    ~Engine() {};
+    void Load_Map(const char * map_name);
 
+    ~Engine() {
+        delete objects;
+    };
 
-    List<Physical_Body> &objects;
+    List<Controllable> *objects = NULL;
 
 private:
-    void logic();
+    //void logic();
 
 };
 
 
 void Engine::run() {
 
-    Traveler bob;
     window.clear();
     sf::Sprite background_sprite(background_image);
     sf::Sprite Allot_s(Allot_t);
@@ -290,15 +284,13 @@ void Engine::run() {
     window.display();
 
 
-
-    ////
     sf::Clock clock;
-    ////
+
     while (window.isOpen()) {
         window.setSize(sf::Vector2u(width * 120, height * 120));
-        ////
+
         clock.restart();
-        ////
+
         window.clear();
         sf::Event event;
 
@@ -312,6 +304,7 @@ void Engine::run() {
 
 
         window.draw(background_sprite);
+        /*
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             Allot(Allot_s);
             bob.create(blocks);
@@ -330,6 +323,7 @@ void Engine::run() {
 
         bob.ShowJorney(blocks);
 
+
         if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
             AlgoritmLi.Create(blocks);
         } else {
@@ -337,24 +331,31 @@ void Engine::run() {
                 FirstPress1 = true;
         }
         AlgoritmLi.ShowBlocks(blocks);
+         */
 
-        ////
+
         long long time = clock.getElapsedTime().asMicroseconds();
-        ////
-        for (auto elem = objects.first(); elem != objects.final(); elem++) {
-            //elem.dump();
-            auto object = (Character *) elem.data_;
-            object->logic(objects);
-            object->control();
-            //object->move((List <Movable> &)objects);
-            //object->draw();
-            //object->live(&elem);
+
+        if (objects) {
+            for (auto elem = objects->first(); elem != objects->final(); elem++) {
+                //elem.dump();
+                auto object = (Character *) elem.data_;
+                object->logic(*objects);
+                object->control();
+                object->move(*objects);
+                object->draw();
+                object->live();
+            }
         }
         window.display();
-        ////
+
         for (;clock.getElapsedTime().asMicroseconds() - time < 5e4;){}
-        ////
+
     }
+}
+
+void Engine::Load_Map(const char *map_name) {
+
 }
 
 
