@@ -16,6 +16,7 @@
 
 int main() {
 
+    /*
     List <Character> super_list;
     char * name1 = (char *) calloc(sizeof(char), strlen("Kirill") + 1);
     strcpy(name1, "Kirill");
@@ -27,6 +28,7 @@ int main() {
     engine.objects = &super_list;
     engine.run();
     free(name1);
+    */
 
     return 0;
 }

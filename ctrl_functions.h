@@ -2,12 +2,13 @@
 // Created by fedya on 24.07.17.
 //
 
+#include <list.h>
 #include "Controllable.h"
 
 #ifndef GAME_BODY_FUNCTIONS_H
 #define GAME_BODY_FUNCTIONS_H
 
-#endif //GAME_BODY_FUNCTIONS_H
+
 
 void Controllable::draw() {
     sprite_.setPosition(coord);
@@ -36,19 +37,7 @@ void Controllable::die() {
     delete list_elem;
 }
 
-sf::Texture * Controllable::Get_Texture(){
-    switch (type){
-#define tex(name, what) case type_##name : {return & name##_texture;}
 
-#include "textures_and_paths.h"
-#undef tex
-        default:{
-            printf("Unknown type\n");
-            getchar();
-            return NULL;
-        };
-    }
-}
 
 void Movable::move() {
 
@@ -56,6 +45,7 @@ void Movable::move() {
     coord.x += v.x * 0.01;
     coord.y += v.y * 0.01;
     bool collision = false;
+    auto objects = *(list_elem->header_);
 
     for (auto elem = objects.first(); elem != objects.final(); elem++){
         auto object = elem.data_;
@@ -158,14 +148,14 @@ void Enemy::attack(Character &Char) {
     Char.suffer(base_damage);
 }
 
-void Enemy::logic(List<Controllable> &objects) {
-    Super_Hero &Hero = (Super_Hero &) *objects[0].data_;
+void Enemy::logic() {
+    /*Super_Hero &Hero = (Super_Hero &) *objects[0].data_;
     if (distance(Hero) < distance_to_see)
         follow(Hero);
     if (distance(Hero) < distance_to_attack) {
         //printFe("Ready to attack\n");
         attack(Hero);
-    }
+    }*/
 }
 
 void Enemy::follow(Character &Char) {
@@ -174,7 +164,4 @@ void Enemy::follow(Character &Char) {
 
 
 
-
-
-
-
+#endif //GAME_BODY_FUNCTIONS_H

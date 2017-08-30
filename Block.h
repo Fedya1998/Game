@@ -5,7 +5,6 @@
 #ifndef GAME_BLOCK_H
 #define GAME_BLOCK_H
 
-#endif //GAME_BLOCK_H
 
 
 class Block {
@@ -21,3 +20,6 @@ public:
     Block() {}
     ~Block(){}
 };
+
+#endif //GAME_BLOCK_H
+

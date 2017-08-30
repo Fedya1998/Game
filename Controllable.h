@@ -9,12 +9,11 @@
 #include <list_h.h>
 #include <SFML/Graphics.hpp>
 
+
 #ifndef GAME_CHARACTER_H
 #define GAME_CHARACTER_H
 
-#endif //GAME_CHARACTER_H
-
-#include "textures.h"
+#include "textures_h.h"
 
 const int INF_MASS = -1;
 
@@ -36,7 +35,7 @@ public:
 
 
     Controllable(char *name, int type) : name(name), type(type) {
-        sf::Texture *texture = textures.Get_Texture(this);
+        sf::Texture *texture = Get_Texture();
         sf::Sprite sprite(*texture);
         sprite_ = sprite;
         width = texture->getSize().x;
@@ -72,6 +71,8 @@ protected:
     sf::Vector2f v;
     sf::Vector2f a;
     size_t v_max = 0;
+    sf::Vector2i dest;
+    List<sf::Vector2i> * journey_list = NULL;
 public:
     Movable(char *name, int type) : Controllable (name, type) {}
     void move();
@@ -81,13 +82,11 @@ public:
 
 class Character : public Movable {
 protected:
-    enum types{
-
-    };
     float angle = 0;
     size_t stamina = 0;
     size_t base_damage = 0;
     size_t cooldown = 0;
+
 public:
     bool selected = false;
 
@@ -162,3 +161,6 @@ protected:
 
     void logic() override;
 };
+
+
+#endif //GAME_CHARACTER_H

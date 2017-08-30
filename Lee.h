@@ -2,29 +2,31 @@
 // Created by fedya on 30.08.17.
 //
 
+
 #ifndef GAME_LEE_H
 #define GAME_LEE_H
-
-#endif //GAME_LEE_H
 
 enum Lee{
     LEE_EMPTY
 };
 
+
 #include "Block.h"
 
-
+#include "Engine_h.h"
 
 int Spread_path(sf::Vector2i start, sf::Vector2i dest, Block blocks[width][height]) ;
 
 List<sf::Vector2i> * Find_Path(sf::Vector2i start, sf::Vector2i dest, Block blocks[width][height]) ;
 
-sf::Vector2i deltas[4] = {(1, 0), (0, 1), (-1, 0), (0, -1)};
+sf::Vector2i deltas[4] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
-List<sf::Vector2i> * Lee(sf::Vector2i start, sf::Vector2i dest, Block blocks [width][height]){
+List<sf::Vector2i> * Lee(sf::Vector2i start, sf::Vector2i dest, Block blocks [width][height], Engine* engine){
     int length = Spread_path(start, dest, blocks);
     if (length == LEE_EMPTY)
         return NULL;
+
+    engine->clear_blocks();
     return Find_Path(start, dest, blocks);
 
 }
@@ -77,3 +79,5 @@ List<sf::Vector2i> * Find_Path(sf::Vector2i start, sf::Vector2i dest, Block bloc
 
     return journey_list;
 }
+
+#endif //GAME_LEE_H
