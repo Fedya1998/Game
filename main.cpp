@@ -1,4 +1,4 @@
-#define DEBUG
+#define NDEBUG
 
 #include <printFe.h>
 #include <super_table.h>
@@ -11,28 +11,22 @@
 
 #include "engine.h"
 
+
 //using namespace std;
-
-
 
 int main() {
 
-    List <Controllable> super_list;
-    /*
-    char img_path[100] = "/home/fedya/Изображения/Game images/deer.png";
+    List <Character> super_list;
     char * name1 = (char *) calloc(sizeof(char), strlen("Kirill") + 1);
     strcpy(name1, "Kirill");
-    super_list.append(new Super_Hero(name1, img_path));
-
-    char img_path2[100] = "/home/fedya/Изображения/Game images/zombie.png";
-    char * name2 = (char *) calloc(sizeof(char), strlen("Zombie") + 1);
-    strcpy(name2, "Zombie");
-    super_list.append(new Enemy(name2, img_path2));
-     */
+    sf::Texture Kirill_texture;
+    Kirill_texture.loadFromFile("/home/fedya/Изображения/Game images/Kirill.jpg");
+    super_list.append(new Super_Hero(name1, Kirill_texture));
 
     Engine engine = Engine();
-
+    engine.objects = &super_list;
     engine.run();
+    free(name1);
 
     return 0;
 }

@@ -36,7 +36,21 @@ void Controllable::die() {
     delete list_elem;
 }
 
-void Movable::move(List<Controllable> &objects) {
+sf::Texture * Controllable::Get_Texture(){
+    switch (type){
+#define tex(name, what) case type_##name : {return & name##_texture;}
+
+#include "textures_and_paths.h"
+#undef tex
+        default:{
+            printf("Unknown type\n");
+            getchar();
+            return NULL;
+        };
+    }
+}
+
+void Movable::move() {
 
     sf::Vector2f coord_old(coord);
     coord.x += v.x * 0.01;
@@ -91,6 +105,11 @@ void Character::draw(){
     Controllable::draw();
 
 }
+
+void Character::control() {//Sets destination vector
+
+}
+
 void Character::suffer(size_t damage) {
     health -= damage;
 }

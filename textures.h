@@ -7,7 +7,9 @@
 #include <SFML/Graphics.hpp>
 using namespace std;
 
-string Images_Dir("/home/fedya/Изображения/Game images/");
+string Images_Dir("/Users/MyMac/CLionProjects/Images/");
+
+
 
 class Texture_Names{
 public:
@@ -39,29 +41,30 @@ public:
 #include "textures_and_paths.h"
 #undef tex
 
-    Textures():Texture_Names(){
+    Textures(){
 #define tex(name, what) name##_path += '.';\
         name##_path += #what;\
-        name##_texture.loadFromFile(name##_path);\
+        name##_texture.loadFromFile(Images_Dir + name##_path);\
 
 #include "textures_and_paths.h"
 #undef tex
     };
-    ~Textures(){};
+    ~Textures() = default;
 
-    sf::Texture * Get_Texture(auto *obj){
-        switch (obj->type){
+
+    sf::Texture * Get_Texture(int type){
+        switch (type){
 #define tex(name, what) case type_##name : {return & name##_texture;}
 
 #include "textures_and_paths.h"
 #undef tex
             default:{
-                printf("Unknown type\n");
-                getchar();
+                return NULL;
             };
         }
     }
 };
 
+Textures textures;
 
 #endif //GAME_TEXTURES_H

@@ -14,7 +14,8 @@
 
 #endif //GAME_CHARACTER_H
 
-Textures textures;
+#include "textures.h"
+
 const int INF_MASS = -1;
 
 class Controllable{
@@ -53,6 +54,7 @@ public:
 
     void live();
     void die();
+    sf::Texture *Get_Texture();
 
     bool operator ==(const Controllable &right){
         return coord.x == right.coord.x && right.coord.y == coord.y && !strcmp(name, right.name);
@@ -61,6 +63,7 @@ public:
     bool operator !=(const Controllable &right) {
         return !(*this==right);
     }
+
 
 };
 
@@ -71,7 +74,7 @@ protected:
     size_t v_max = 0;
 public:
     Movable(char *name, int type) : Controllable (name, type) {}
-    void move(List<Controllable> &objects);
+    void move();
     void collide(Controllable &Body);
     void collide(Movable &movable);
 };
@@ -96,9 +99,9 @@ public:
 
     void draw() override;
 
-    virtual void control() = 0;
+    virtual void control();
 
-    virtual void logic(List<Controllable> &objects) = 0;
+    virtual void logic() = 0;
 
 
 
@@ -129,7 +132,7 @@ public:
 
     void control() override;
 
-    void logic(List<Controllable> &objects) override{
+    void logic() override{
 
     }
 };
@@ -157,5 +160,5 @@ protected:
 
     void follow(Character &Char);
 
-    void logic(List<Controllable> &objects) override;
+    void logic() override;
 };

@@ -10,8 +10,9 @@
 sf::RenderWindow window(sf::VideoMode(1920, 1080), "A Swagabitch game");
 
 #include <list.h>
-#include "textures.h"
-#include "ctrl_functions.h"
+#include "Controllable.h"
+#include <math.h>
+
 
 sf::Vector2i Start;
 sf::Vector2i Now;
@@ -20,66 +21,16 @@ const sf::Vector2u size = window.getSize();
 const sf::Vector2i block_size(120, 120);
 const int width = 16, height = 9;
 
+
+
+#include "Lee.h"
+
+
 template<typename T>
 double Distance(sf::Vector2<T> a, sf::Vector2<T> b) {
     return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
 }
 
-/*
-class Point {
-public:
-    int wave = -1;
-    sf::Vector2i point_pos;
-    bool passable = true,//Указатель на то, что на блоке
-            allotment = false,
-            partOfJorney = false;
-};
-
-*/
-class Block {
-public:
-    sf::Vector2i point_pos;
-
-    int surface = Textures::type_empty;
-    Controllable * afloat = NULL;
-
-    Block() {
-        /*
-        block_tex.loadFromFile(Images_Dir + "wall.jpg");
-        sf::Sprite sprite(block_tex);
-        block_spr = sprite;
-        int Block_width = block_tex.getSize().x;
-        int Block_height = block_tex.getSize().y;
-        block_spr.setOrigin(Block_width / 2, Block_height / 2);
-         */
-    }
-/*
-    void Create(class Point blocks[][width]) {
-
-        if (FirstPress1) {
-            sf::Vector2i vector(sf::Mouse::getPosition(window).y / 120, sf::Mouse::getPosition(window).x / 120); // переделал
-            FocusOn = vector;
-            if (blocks[FocusOn.x][FocusOn.y].passable) {
-                blocks[FocusOn.x][FocusOn.y].passable = false;
-                block_spr.setPosition(blocks[FocusOn.x][FocusOn.y].point_pos.x,
-                                      blocks[FocusOn.x][FocusOn.y].point_pos.y);
-            } else
-                blocks[FocusOn.x][FocusOn.y].passable = true;
-        }
-        FirstPress1 = false;
-    }
-
-    void ShowBlocks(class Point blocks[][width]) {
-        int i, j;
-        for (i = 0; i < height; i++)
-            for (j = 0; j < width; j++)
-                if (blocks[i][j].passable == false) {
-                    block_spr.setPosition(blocks[i][j].point_pos.x, blocks[i][j].point_pos.y);
-                    window.draw(block_spr);
-                }
-    }
-    */
-};
 
 /*
 class Traveler : public Point {
@@ -225,9 +176,9 @@ public:
     Block blocks[width][height];
     sf::Texture Allot_t;
 
-    std::string bg_path = Images_Dir + "bg.jpg";
+    std::string bg_path = Images_Dir + "bg.png";
 
-    void run();
+    virtual void run();
 
     Engine() {
         objects = new List<Controllable>;
@@ -247,15 +198,9 @@ public:
                 }
             }
         }
-        /*
-        for (int i = 0; i < height; i++)
-            for (int j = 0; j < width; j++)
-                if (((i < 1) || (i > 7)) || ((j < 1) || (j > 14)))
-                    blocks[i][j].passable = false;
-        */
 
         background_image.loadFromFile(bg_path);
-        Allot_t.loadFromFile(Images_Dir + "texture.jpg");
+        Allot_t.loadFromFile(Images_Dir + "texture.png");
 
     };
 
@@ -270,6 +215,7 @@ public:
 private:
     //void logic();
 
+    void clear_blocks();
 };
 
 
@@ -303,34 +249,6 @@ void Engine::run() {
 
 
         window.draw(background_sprite);
-        /*
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-            Allot(Allot_s);
-            bob.create(blocks);
-            if (StartSet) {
-                bob.create(blocks);
-            } else {
-                bob.Wave(blocks);
-                bob.GoBack(blocks);
-            }
-        } else {
-            if (!FirstPress) {
-                FirstPress = true;
-                FirstPress2 = true;
-            }
-        }
-
-        bob.ShowJorney(blocks);
-
-
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-            AlgoritmLi.Create(blocks);
-        } else {
-            if (!FirstPress1)
-                FirstPress1 = true;
-        }
-        AlgoritmLi.ShowBlocks(blocks);
-         */
 
 
         long long time = clock.getElapsedTime().asMicroseconds();
@@ -339,9 +257,9 @@ void Engine::run() {
             for (auto elem = objects->first(); elem != objects->final(); elem++) {
                 //elem.dump();
                 auto object = (Character *) elem.data_;
-                object->logic(*objects);
+                object->logic();
                 object->control();
-                object->move(*objects);
+                object->move();
                 object->draw();
                 object->live();
             }
@@ -357,5 +275,12 @@ void Engine::Load_Map(const char *map_name) {
 
 }
 
+void Engine::clear_blocks(){
+    for (int i = 0; i < width; i++){
+        for (int j = 0; j < height; j++){
+            blocks[i][j].path = LEE_EMPTY;
+        }
+    }
+}
 
 
