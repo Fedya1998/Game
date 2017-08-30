@@ -61,8 +61,7 @@ List<sf::Vector2i> * Find_Path(sf::Vector2i start, sf::Vector2i dest, Block bloc
     int length = blocks[dest.x][dest.y].path;
     journey_list->append(new sf::Vector2i(dest));
     List_Elem<sf::Vector2i> * elem = journey_list->first_;
-    while (length > 0)
-    {
+    while (length > 0) {
 
         length--;
         sf::Vector2i now = dest;
